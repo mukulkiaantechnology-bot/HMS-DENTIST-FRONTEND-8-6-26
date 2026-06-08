@@ -118,7 +118,7 @@ export function ClinicOwnerDashboardPage() {
             <TrendingUp className="h-4 w-4 text-primary" />
             Monthly Collections ($)
           </h3>
-          <div className="h-[220px] w-full">
+          <div className="h-64 lg:h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={revenueChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
@@ -143,7 +143,7 @@ export function ClinicOwnerDashboardPage() {
             <Users className="h-4 w-4 text-indigo-400" />
             Daily Patient Flow (Weekly)
           </h3>
-          <div className="h-[220px] w-full">
+          <div className="h-64 lg:h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={flowChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-muted/40" />

@@ -272,19 +272,19 @@ export function FrontDeskAppointmentsPage() {
             className="text-xs text-foreground font-medium"
           />
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-border">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-4 w-full">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setIsBookModalOpen(false)}
-              className="font-bold text-xs"
+              className="font-bold text-xs w-full sm:w-auto h-10 sm:h-9"
             >
               Cancel
             </Button>
             <Button
               size="sm"
               onClick={handleBookAppointment}
-              className="font-bold text-xs"
+              className="font-bold text-xs w-full sm:w-auto h-10 sm:h-9"
             >
               Confirm Book Slot
             </Button>
@@ -436,12 +436,12 @@ export function FrontDeskRegistrationPage() {
         header: 'Actions',
         align: 'right',
         render: (p) => (
-          <div className="flex gap-2 justify-end">
+          <div className="flex flex-col sm:flex-row gap-2 justify-end w-full">
             <Button
               size="xs"
               variant="outline"
               onClick={() => handleOpenEdit(p)}
-              className="text-primary hover:bg-primary/10 border-primary/20 hover:border-primary/30 font-bold gap-1 cursor-pointer h-7"
+              className="text-primary hover:bg-primary/10 border-primary/20 hover:border-primary/30 font-bold gap-1 cursor-pointer h-9 sm:h-7 w-full sm:w-auto justify-center"
             >
               <Edit2 className="h-3 w-3" />
               Edit
@@ -450,7 +450,7 @@ export function FrontDeskRegistrationPage() {
               size="xs"
               variant="outline"
               onClick={() => handleDelete(p.id, p.name)}
-              className="text-rose-500 hover:bg-rose-500/10 border-rose-500/20 hover:border-rose-500/30 font-bold gap-1 cursor-pointer h-7"
+              className="text-rose-500 hover:bg-rose-500/10 border-rose-500/20 hover:border-rose-500/30 font-bold gap-1 cursor-pointer h-9 sm:h-7 w-full sm:w-auto justify-center"
             >
               <Trash2 className="h-3 w-3" />
               Delete
@@ -631,7 +631,7 @@ export function FrontDeskRegistrationPage() {
             </div>
           )}
 
-          <div className="flex justify-end pt-4 border-t border-border mt-6 gap-2">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-6 w-full">
             <Button
               type="button"
               variant="outline"
@@ -639,11 +639,11 @@ export function FrontDeskRegistrationPage() {
                 setShowForm(false);
                 setEditingPatient(null);
               }}
-              className="font-bold text-xs px-5 h-10 cursor-pointer"
+              className="font-bold text-xs w-full sm:w-auto h-11 sm:h-10 cursor-pointer"
             >
               Cancel
             </Button>
-            <Button type="submit" className="font-bold text-xs px-6 py-2.5 h-10 cursor-pointer">
+            <Button type="submit" className="font-bold text-xs w-full sm:w-auto h-11 sm:h-10 cursor-pointer">
               {editingPatient ? 'Update Patient File' : 'Complete Patient Registration →'}
             </Button>
           </div>
@@ -737,7 +737,7 @@ export function FrontDeskInsurancePage() {
           size="xs"
           disabled={ins.status !== 'Pending' || checkingId === ins.id}
           onClick={() => handleEvaluate(ins.id, ins.patientName)}
-          className="font-bold text-[9px] gap-1 cursor-pointer h-7"
+          className="font-bold text-[9px] gap-1 cursor-pointer h-9 sm:h-7 w-full sm:w-auto justify-center"
         >
           {checkingId === ins.id ? (
             <span className="animate-pulse">Checking...</span>

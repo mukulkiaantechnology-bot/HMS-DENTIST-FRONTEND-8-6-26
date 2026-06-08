@@ -186,27 +186,76 @@ export function FrontDeskDashboardPage() {
                 <span>No appointments booked for today.</span>
               </div>
             ) : (
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-border/50 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
-                    <th className="py-2.5">Time</th>
-                    <th className="py-2.5">Patient</th>
-                    <th className="py-2.5">Provider</th>
-                    <th className="py-2.5 text-center">Intake Status</th>
-                    <th className="py-2.5 text-right">Check-In Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/40 font-medium text-foreground">
+              <>
+                {/* Desktop View */}
+                <table className="hidden md:table w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-border/50 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+                      <th className="py-2.5">Time</th>
+                      <th className="py-2.5">Patient</th>
+                      <th className="py-2.5">Provider</th>
+                      <th className="py-2.5 text-center">Intake Status</th>
+                      <th className="py-2.5 text-right">Check-In Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/40 font-medium text-foreground">
+                    {todayAppointments.map((appt) => (
+                      <tr key={appt.id} className="hover:bg-muted/30 transition-colors">
+                        <td className="py-3 font-bold text-primary">{appt.time}</td>
+                        <td className="py-3">
+                          <div className="font-extrabold text-foreground">{appt.patientName}</div>
+                          <div className="text-[10px] text-muted-foreground">{appt.type}</div>
+                        </td>
+                        <td className="py-3 text-muted-foreground truncate max-w-[120px]">{appt.dentistName}</td>
+                        <td className="py-3 text-center">
+                          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full inline-block ${
+                            appt.status === 'Checked-In'
+                              ? 'text-primary bg-primary/10 border border-primary/20'
+                              : appt.status === 'Completed'
+                              ? 'text-emerald-500 bg-emerald-500/10 border border-emerald-500/20'
+                              : 'text-amber-500 bg-amber-500/10 border border-amber-500/20'
+                          }`}>
+                            {appt.status}
+                          </span>
+                        </td>
+                        <td className="py-3 text-right">
+                          <div className="flex gap-1 justify-end">
+                            <Button
+                              size="xs"
+                              variant="primary"
+                              disabled={appt.status === 'Checked-In'}
+                              onClick={() => handleUpdateAptStatus(appt.id, 'Checked-In')}
+                              className="font-bold text-[9px] h-7 cursor-pointer"
+                            >
+                              Arrived
+                            </Button>
+                            <Button
+                              size="xs"
+                              variant="outline"
+                              disabled={appt.status === 'Completed'}
+                              onClick={() => handleUpdateAptStatus(appt.id, 'Completed')}
+                              className="font-bold text-[9px] h-7 cursor-pointer"
+                            >
+                              Done
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {/* Mobile Card List View */}
+                <div className="flex flex-col gap-3 md:hidden">
                   {todayAppointments.map((appt) => (
-                    <tr key={appt.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="py-3 font-bold text-primary">{appt.time}</td>
-                      <td className="py-3">
-                        <div className="font-extrabold text-foreground">{appt.patientName}</div>
-                        <div className="text-[10px] text-muted-foreground">{appt.type}</div>
-                      </td>
-                      <td className="py-3 text-muted-foreground truncate max-w-[120px]">{appt.dentistName}</td>
-                      <td className="py-3 text-center">
-                        <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full inline-block ${
+                    <div key={appt.id} className="p-4 border border-border/80 rounded-2xl bg-card text-left space-y-3 shadow-sm">
+                      <div className="flex justify-between items-start gap-2">
+                        <div>
+                          <span className="text-xs font-black text-primary block">{appt.time}</span>
+                          <h4 className="font-extrabold text-sm text-foreground">{appt.patientName}</h4>
+                          <span className="text-[10px] text-muted-foreground font-semibold">{appt.type}</span>
+                        </div>
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
                           appt.status === 'Checked-In'
                             ? 'text-primary bg-primary/10 border border-primary/20'
                             : appt.status === 'Completed'
@@ -215,33 +264,34 @@ export function FrontDeskDashboardPage() {
                         }`}>
                           {appt.status}
                         </span>
-                      </td>
-                      <td className="py-3 text-right">
-                        <div className="flex gap-1 justify-end">
-                          <Button
-                            size="xs"
-                            variant="primary"
-                            disabled={appt.status === 'Checked-In'}
-                            onClick={() => handleUpdateAptStatus(appt.id, 'Checked-In')}
-                            className="font-bold text-[9px] h-7 cursor-pointer"
-                          >
-                            Arrived
-                          </Button>
-                          <Button
-                            size="xs"
-                            variant="outline"
-                            disabled={appt.status === 'Completed'}
-                            onClick={() => handleUpdateAptStatus(appt.id, 'Completed')}
-                            className="font-bold text-[9px] h-7 cursor-pointer"
-                          >
-                            Done
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
+                      </div>
+                      <div className="text-[11px] font-medium text-muted-foreground">
+                        <span className="font-semibold text-muted-foreground/75">Provider:</span> {appt.dentistName}
+                      </div>
+                      <div className="flex gap-2.5 pt-2 border-t border-border/40">
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          disabled={appt.status === 'Checked-In'}
+                          onClick={() => handleUpdateAptStatus(appt.id, 'Checked-In')}
+                          className="flex-1 font-bold text-xs h-10 cursor-pointer"
+                        >
+                          Arrived
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={appt.status === 'Completed'}
+                          onClick={() => handleUpdateAptStatus(appt.id, 'Completed')}
+                          className="flex-1 font-bold text-xs h-10 cursor-pointer"
+                        >
+                          Done
+                        </Button>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -304,58 +354,108 @@ export function FrontDeskDashboardPage() {
                 No active walk-ins logged in the system.
               </div>
             ) : (
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-border/50 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
-                    <th className="py-2">Arrived</th>
-                    <th className="py-2">Patient Name</th>
-                    <th className="py-2">Assigned Doctor</th>
-                    <th className="py-2 text-center">Status</th>
-                    <th className="py-2 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/40 font-medium text-foreground">
+              <>
+                {/* Desktop Table View */}
+                <table className="hidden md:table w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-border/50 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+                      <th className="py-2">Arrived</th>
+                      <th className="py-2">Patient Name</th>
+                      <th className="py-2">Assigned Doctor</th>
+                      <th className="py-2 text-center">Status</th>
+                      <th className="py-2 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/40 font-medium text-foreground">
+                    {walkins.map((wi) => (
+                      <tr key={wi.id} className="hover:bg-muted/30 transition-colors">
+                        <td className="py-2.5 font-bold text-primary">{wi.arrivedTime}</td>
+                        <td className="py-2.5">
+                          <div className="font-extrabold text-foreground">{wi.patientName}</div>
+                          <div className="text-[9px] text-muted-foreground">{wi.phone}</div>
+                        </td>
+                        <td className="py-2.5 text-muted-foreground">{wi.doctor}</td>
+                        <td className="py-2.5 text-center">
+                          <select
+                            value={wi.status}
+                            onChange={(e) => updateWalkInStatus(wi.id, e.target.value)}
+                            className={`text-[9px] font-bold px-2 py-0.5 rounded-full bg-muted border border-border outline-none cursor-pointer ${
+                              wi.status === 'Checked-In'
+                                ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20'
+                                : 'text-amber-500 bg-amber-500/10 border-amber-500/20'
+                            }`}
+                          >
+                            <option value="Waiting">Waiting</option>
+                            <option value="Checked-In">Checked-In</option>
+                            <option value="Completed">Completed</option>
+                          </select>
+                        </td>
+                        <td className="py-2.5 text-right">
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            disabled={wi.status === 'Completed'}
+                            onClick={() => {
+                              updateWalkInStatus(wi.id, 'Completed');
+                              toast.success(`${wi.patientName} checked-in successfully!`);
+                            }}
+                            className="font-bold text-[9px] h-7 text-primary hover:text-primary-foreground hover:bg-primary"
+                          >
+                            Check In
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {/* Mobile Card List View */}
+                <div className="flex flex-col gap-3 md:hidden">
                   {walkins.map((wi) => (
-                    <tr key={wi.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="py-2.5 font-bold text-primary">{wi.arrivedTime}</td>
-                      <td className="py-2.5">
-                        <div className="font-extrabold text-foreground">{wi.patientName}</div>
-                        <div className="text-[9px] text-muted-foreground">{wi.phone}</div>
-                      </td>
-                      <td className="py-2.5 text-muted-foreground">{wi.doctor}</td>
-                      <td className="py-2.5 text-center">
-                        <select
-                          value={wi.status}
-                          onChange={(e) => updateWalkInStatus(wi.id, e.target.value)}
-                          className={`text-[9px] font-bold px-2 py-0.5 rounded-full bg-muted border border-border outline-none cursor-pointer ${
-                            wi.status === 'Checked-In'
-                              ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20'
-                              : 'text-amber-500 bg-amber-500/10 border-amber-500/20'
-                          }`}
-                        >
-                          <option value="Waiting">Waiting</option>
-                          <option value="Checked-In">Checked-In</option>
-                          <option value="Completed">Completed</option>
-                        </select>
-                      </td>
-                      <td className="py-2.5 text-right">
+                    <div key={wi.id} className="p-4 border border-border/80 rounded-2xl bg-card text-left space-y-3 shadow-sm">
+                      <div className="flex justify-between items-start gap-2">
+                        <div>
+                          <span className="text-xs font-black text-primary block">{wi.arrivedTime}</span>
+                          <h4 className="font-extrabold text-sm text-foreground">{wi.patientName}</h4>
+                          <span className="text-[10px] text-muted-foreground font-semibold">{wi.phone}</span>
+                        </div>
+                        <div>
+                          <select
+                            value={wi.status}
+                            onChange={(e) => updateWalkInStatus(wi.id, e.target.value)}
+                            className={`text-[9px] font-bold px-2.5 py-1 rounded-full bg-muted border border-border outline-none cursor-pointer ${
+                              wi.status === 'Checked-In'
+                                ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20'
+                                : 'text-amber-500 bg-amber-500/10 border-amber-500/20'
+                            }`}
+                          >
+                            <option value="Waiting">Waiting</option>
+                            <option value="Checked-In">Checked-In</option>
+                            <option value="Completed">Completed</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="text-[11px] font-medium text-muted-foreground">
+                        <span className="font-semibold text-muted-foreground/75">Assigned Doctor:</span> {wi.doctor}
+                      </div>
+                      <div className="pt-2 border-t border-border/40">
                         <Button
-                          size="xs"
-                          variant="ghost"
+                          size="sm"
+                          variant="outline"
                           disabled={wi.status === 'Completed'}
                           onClick={() => {
                             updateWalkInStatus(wi.id, 'Completed');
                             toast.success(`${wi.patientName} checked-in successfully!`);
                           }}
-                          className="font-bold text-[9px] h-7 text-primary hover:text-primary-foreground hover:bg-primary"
+                          className="w-full font-bold text-xs h-10 text-primary hover:text-primary-foreground hover:bg-primary cursor-pointer"
                         >
                           Check In
                         </Button>
-                      </td>
-                    </tr>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
+                </div>
+              </>
             )}
           </div>
         </div>

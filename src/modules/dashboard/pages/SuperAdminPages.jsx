@@ -136,7 +136,7 @@ export function SuperAdminClinicsPage() {
 
   return (
     <div className="space-y-6 text-left">
-      <div className="flex items-center justify-between border-b border-border pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <Building2 className="h-6 w-6 text-primary" />
@@ -144,7 +144,7 @@ export function SuperAdminClinicsPage() {
           </h2>
           <p className="text-xs text-muted-foreground font-semibold">Monitor, register, and configure licensing details for all locations.</p>
         </div>
-        <Button onClick={handleOpenAdd} className="gap-1.5">
+        <Button onClick={handleOpenAdd} className="gap-1.5 w-full sm:w-auto justify-center">
           <Plus className="h-4 w-4" />
           Add Clinic Location
         </Button>
@@ -171,9 +171,9 @@ export function SuperAdminClinicsPage() {
               { value: 'Trial', label: 'Trial Mode ($0/mo)' }
             ]}
           />
-          <div className="flex justify-end gap-2 pt-4 border-t border-border">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
-            <Button type="submit">Save Location</Button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-4 w-full">
+            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} className="w-full sm:w-auto h-11 sm:h-10">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto h-11 sm:h-10">Save Location</Button>
           </div>
         </form>
       </Modal>
@@ -205,9 +205,9 @@ export function SuperAdminClinicsPage() {
               { value: 'Suspended', label: 'Suspended (Overdue)' }
             ]}
           />
-          <div className="flex justify-end gap-2 pt-4 border-t border-border">
-            <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
-            <Button type="submit">Save Changes</Button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-4 w-full">
+            <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} className="w-full sm:w-auto h-11 sm:h-10">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto h-11 sm:h-10">Save Changes</Button>
           </div>
         </form>
       </Modal>
@@ -313,7 +313,7 @@ export function SuperAdminSubscriptionsPage() {
 
   return (
     <div className="space-y-6 text-left">
-      <div className="flex items-center justify-between border-b border-border pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <Receipt className="h-6 w-6 text-primary" />
@@ -321,7 +321,7 @@ export function SuperAdminSubscriptionsPage() {
           </h2>
           <p className="text-xs text-muted-foreground font-semibold">Configure system-wide pricing subscription plans for the platform.</p>
         </div>
-        <Button onClick={handleOpenPlanAdd} className="gap-1.5">
+        <Button onClick={handleOpenPlanAdd} className="gap-1.5 w-full sm:w-auto justify-center">
           <Plus className="h-4 w-4" />
           Add Subscription Plan
         </Button>
@@ -362,9 +362,9 @@ export function SuperAdminSubscriptionsPage() {
             onChange={(e) => setPlanFeatures(e.target.value)}
             placeholder="e.g. Unlimited staff, basic charts, recalls"
           />
-          <div className="flex justify-end gap-2 pt-4 border-t border-border">
-            <Button type="button" variant="outline" onClick={() => setIsPlanAddOpen(false)}>Cancel</Button>
-            <Button type="submit">Create Plan</Button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-4 w-full">
+            <Button type="button" variant="outline" onClick={() => setIsPlanAddOpen(false)} className="w-full sm:w-auto h-11 sm:h-10">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto h-11 sm:h-10">Create Plan</Button>
           </div>
         </form>
       </Modal>
@@ -400,10 +400,10 @@ export function SuperAdminSubscriptionsPage() {
               value={planFeatures}
               onChange={(e) => setPlanFeatures(e.target.value)}
             />
-            <div className="flex justify-end gap-2 pt-4 border-t border-border">
-              <Button type="button" variant="outline" onClick={() => setIsPlanEditOpen(false)}>Cancel</Button>
-              <Button type="submit">Save Changes</Button>
-            </div>
+             <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-4 w-full">
+               <Button type="button" variant="outline" onClick={() => setIsPlanEditOpen(false)} className="w-full sm:w-auto h-11 sm:h-10">Cancel</Button>
+               <Button type="submit" className="w-full sm:w-auto h-11 sm:h-10">Save Changes</Button>
+             </div>
           </form>
         )}
       </Modal>
@@ -519,7 +519,7 @@ export function SuperAdminBillingPage() {
 
   return (
     <div className="space-y-6 text-left">
-      <div className="flex items-center justify-between border-b border-border pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <DollarSign className="h-6 w-6 text-primary" />
@@ -527,7 +527,7 @@ export function SuperAdminBillingPage() {
           </h2>
           <p className="text-xs text-muted-foreground font-semibold">Track historical recurring payments and generate new invoices.</p>
         </div>
-        <Button onClick={handleOpenAdd} className="gap-1.5">
+        <Button onClick={handleOpenAdd} className="gap-1.5 w-full sm:w-auto justify-center">
           <Plus className="h-4 w-4" />
           Create Invoice
         </Button>
@@ -558,9 +558,9 @@ export function SuperAdminBillingPage() {
               { value: 'Overdue', label: 'Overdue' }
             ]}
           />
-          <div className="flex justify-end gap-2 pt-4 border-t border-border">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
-            <Button type="submit">Generate Invoice</Button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-4 w-full">
+            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} className="w-full sm:w-auto h-11 sm:h-10">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto h-11 sm:h-10">Generate Invoice</Button>
           </div>
         </form>
       </Modal>
@@ -588,10 +588,10 @@ export function SuperAdminBillingPage() {
                 { value: 'Overdue', label: 'Overdue' }
               ]}
             />
-            <div className="flex justify-end gap-2 pt-4 border-t border-border">
-              <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
-              <Button type="submit">Save Changes</Button>
-            </div>
+             <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-4 w-full">
+               <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} className="w-full sm:w-auto h-11 sm:h-10">Cancel</Button>
+               <Button type="submit" className="w-full sm:w-auto h-11 sm:h-10">Save Changes</Button>
+             </div>
           </form>
         )}
       </Modal>
@@ -698,7 +698,7 @@ export function SuperAdminReportsPage() {
 
       <div className="bg-card border border-border p-5 rounded-xl shadow-sm space-y-4">
         <h3 className="font-bold text-sm text-foreground uppercase tracking-wider">Clinic Collections vs HQ SaaS Billing (Annualized)</h3>
-        <div className="h-[280px] w-full">
+        <div className="h-64 md:h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 20, right: 10, left: -10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-muted/40" />
@@ -856,7 +856,7 @@ export function SuperAdminUsersPage() {
 
   return (
     <div className="space-y-6 text-left">
-      <div className="flex items-center justify-between border-b border-border pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <UserCheck className="h-6 w-6 text-primary" />
@@ -864,7 +864,7 @@ export function SuperAdminUsersPage() {
           </h2>
           <p className="text-xs text-muted-foreground font-semibold">Manage authorization credentials and approvals for all clinic staff roles.</p>
         </div>
-        <Button onClick={handleOpenAdd} className="gap-1.5">
+        <Button onClick={handleOpenAdd} className="gap-1.5 w-full sm:w-auto justify-center">
           <Plus className="h-4 w-4" />
           Add User
         </Button>
@@ -900,9 +900,9 @@ export function SuperAdminUsersPage() {
             onChange={(e) => setClinicId(e.target.value)}
             options={clinics.map((c) => ({ value: c.id, label: c.name }))}
           />
-          <div className="flex justify-end gap-2 pt-4 border-t border-border">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
-            <Button type="submit">Create User</Button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-4 w-full">
+            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} className="w-full sm:w-auto h-11 sm:h-10">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto h-11 sm:h-10">Create User</Button>
           </div>
         </form>
       </Modal>
@@ -934,10 +934,10 @@ export function SuperAdminUsersPage() {
               onChange={(e) => setClinicId(e.target.value)}
               options={clinics.map((c) => ({ value: c.id, label: c.name }))}
             />
-            <div className="flex justify-end gap-2 pt-4 border-t border-border">
-              <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
-              <Button type="submit">Save Changes</Button>
-            </div>
+             <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-4 w-full">
+               <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} className="w-full sm:w-auto h-11 sm:h-10">Cancel</Button>
+               <Button type="submit" className="w-full sm:w-auto h-11 sm:h-10">Save Changes</Button>
+             </div>
           </form>
         )}
       </Modal>

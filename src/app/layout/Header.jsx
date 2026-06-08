@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sun, Moon, LogOut, Building2, Bell } from 'lucide-react';
+import { Sun, Moon, LogOut, Building2, Bell, Menu } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useClinicStore } from '../../store/clinicStore';
 import { Button } from '../../shared/ui/Button';
 
-export function Header() {
+export function Header({ onMenuClick }) {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
@@ -47,15 +47,24 @@ export function Header() {
   ];
 
   return (
-    <header className="h-16 border-b border-border bg-card text-foreground px-6 flex items-center justify-between z-40 select-none">
-      {/* Clinic Switcher */}
+    <header className="h-16 border-b border-border bg-card text-foreground px-4 md:px-6 flex items-center justify-between z-40 select-none flex-shrink-0">
+      {/* Clinic Switcher & Mobile Menu Trigger */}
       <div className="flex items-center gap-2">
-        <Building2 className="h-4 w-4 text-muted-foreground" />
+        {/* Mobile menu toggle */}
+        <button
+          onClick={onMenuClick}
+          className="md:hidden p-2 -ml-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer focus:outline-none"
+          title="Open Menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+
+        <Building2 className="h-4 w-4 text-muted-foreground hidden sm:block" />
         <div className="relative">
           <select
             value={selectedClinicId}
             onChange={handleClinicChange}
-            className="bg-transparent text-sm font-semibold text-foreground/90 border-none outline-none pr-6 cursor-pointer focus:ring-0 focus:ring-offset-0 py-1"
+            className="bg-transparent text-xs sm:text-sm font-semibold text-foreground/90 border-none outline-none pr-6 cursor-pointer focus:ring-0 focus:ring-offset-0 py-1 max-w-[150px] sm:max-w-none truncate"
           >
             {clinicOptions.map((opt) => (
               <option key={opt.value} value={opt.value} className="bg-card text-foreground">
@@ -67,9 +76,9 @@ export function Header() {
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 md:gap-3">
         {/* Notifications Mock */}
-        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground">
+        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground cursor-pointer">
           <Bell className="h-4 w-4" />
         </Button>
 
@@ -78,20 +87,20 @@ export function Header() {
           variant="ghost"
           size="icon"
           onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-          className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground"
+          className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
           title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
         >
           {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
         </Button>
 
-        <div className="h-6 w-px bg-border my-auto mx-1" />
+        <div className="h-6 w-px bg-border my-auto mx-0.5 sm:mx-1" />
 
         {/* Log Out */}
         <Button
           variant="ghost"
           size="sm"
           onClick={handleLogout}
-          className="h-9 px-3 gap-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+          className="h-9 px-2.5 sm:px-3 gap-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
         >
           <LogOut className="h-4 w-4" />
           <span className="hidden sm:inline font-semibold">Sign Out</span>
@@ -100,3 +109,4 @@ export function Header() {
     </header>
   );
 }
+export default Header;

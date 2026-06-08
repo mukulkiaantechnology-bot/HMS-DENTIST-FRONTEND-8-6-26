@@ -4,7 +4,7 @@ import * as Icons from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { cn } from '../../shared/utils/cn';
 
-export function FrontDeskSidebar() {
+export function FrontDeskSidebar({ isMobileOpen, onClose }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const user = useAuthStore((state) => state.user);
   const location = useLocation();
@@ -21,16 +21,30 @@ export function FrontDeskSidebar() {
 
   return (
     <>
-      {/* 1. DESKTOP SIDEBAR */}
+      {/* Mobile Backdrop */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden animate-fade-in"
+          onClick={onClose}
+        />
+      )}
+
+      {/* Sidebar Container */}
       <aside
         className={cn(
-          'hidden md:flex flex-col h-screen bg-card border-r border-border text-foreground transition-all duration-300 relative z-30',
-          isCollapsed ? 'w-[72px]' : 'w-[260px]'
+          // base sidebar styles
+          'flex flex-col h-full bg-card border-r border-border text-foreground transition-all duration-300 relative',
+          // desktop layout
+          'hidden md:flex h-screen z-30',
+          isCollapsed ? 'md:w-[72px]' : 'md:w-[260px]',
+          // mobile drawer layout
+          'fixed md:relative inset-y-0 left-0 z-50 w-[260px]',
+          isMobileOpen ? 'translate-x-0 flex' : '-translate-x-full md:translate-x-0'
         )}
       >
         {/* Brand Header */}
         <div className="flex items-center justify-between px-4 h-16 border-b border-border">
-          {!isCollapsed && (
+          {(!isCollapsed || isMobileOpen) && (
             <div className="flex items-center gap-2 select-none">
               <div className="bg-primary text-primary-foreground p-1.5 rounded-lg shadow-sm">
                 <Icons.Sparkles className="h-5 w-5" />
@@ -40,23 +54,32 @@ export function FrontDeskSidebar() {
               </span>
             </div>
           )}
-          {isCollapsed && (
+          {isCollapsed && !isMobileOpen && (
             <div className="mx-auto bg-primary text-primary-foreground p-1.5 rounded-lg">
               <Icons.Sparkles className="h-5 w-5" />
             </div>
           )}
+          {/* Close button inside sidebar for mobile drawer */}
+          {isMobileOpen && (
+            <button
+              onClick={onClose}
+              className="md:hidden p-1.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
+            >
+              <Icons.X className="h-5 w-5" />
+            </button>
+          )}
         </div>
 
-        {/* Collapse Toggle button */}
+        {/* Collapse Toggle button - desktop only */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-20 bg-card border border-border text-muted-foreground hover:text-foreground h-6 w-6 rounded-full flex items-center justify-center cursor-pointer shadow-sm z-40 hover:scale-105 transition-transform"
+          className="hidden md:flex absolute -right-3 top-20 bg-card border border-border text-muted-foreground hover:text-foreground h-6 w-6 rounded-full items-center justify-center cursor-pointer shadow-sm z-20 hover:scale-105 transition-transform"
         >
           {isCollapsed ? <Icons.ChevronRight className="h-3 w-3" /> : <Icons.ChevronLeft className="h-3 w-3" />}
         </button>
 
         {/* Active Session Info */}
-        {!isCollapsed ? (
+        {(!isCollapsed || isMobileOpen) ? (
           <div className="p-4 mx-4 my-3 rounded-lg bg-muted/50 border border-border/40 text-left">
             <div className="text-[9px] uppercase font-bold tracking-widest text-primary mb-0.5">
               Active Registrar
@@ -84,6 +107,9 @@ export function FrontDeskSidebar() {
               <NavLink
                 key={item.key}
                 to={item.path}
+                onClick={() => {
+                  if (isMobileOpen && onClose) onClose();
+                }}
                 className={cn(
                   'flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold tracking-wide transition-all duration-200 group relative',
                   isActive
@@ -92,8 +118,8 @@ export function FrontDeskSidebar() {
                 )}
               >
                 <IconComp className="h-4.5 w-4.5 flex-shrink-0" />
-                {!isCollapsed && <span className="truncate">{item.label}</span>}
-                {isCollapsed && (
+                {(!isCollapsed || isMobileOpen) && <span className="truncate">{item.label}</span>}
+                {isCollapsed && !isMobileOpen && (
                   <div className="absolute left-16 bg-popover text-popover-foreground text-xs font-semibold px-2.5 py-1.5 rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 border border-border">
                     {item.label}
                   </div>
@@ -105,7 +131,7 @@ export function FrontDeskSidebar() {
 
         {/* Footer Info */}
         <div className="p-4 border-t border-border flex items-center justify-between">
-          {!isCollapsed && (
+          {(!isCollapsed || isMobileOpen) && (
             <div className="flex items-center gap-3 text-left w-full overflow-hidden">
               <img
                 src={user.avatarUrl || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150'}
@@ -118,7 +144,7 @@ export function FrontDeskSidebar() {
               </div>
             </div>
           )}
-          {isCollapsed && (
+          {isCollapsed && !isMobileOpen && (
             <img
               src={user.avatarUrl || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150'}
               alt={user.name}
@@ -127,30 +153,6 @@ export function FrontDeskSidebar() {
           )}
         </div>
       </aside>
-
-      {/* 2. MOBILE BOTTOM NAVIGATION */}
-      <div className="fixed bottom-0 left-0 right-0 h-16 bg-card border-t border-border flex items-center justify-around z-40 md:hidden pb-safe shadow-lg px-2">
-        {menuItems.map((item) => {
-          const IconComp = Icons[item.icon] || Icons.HelpCircle;
-          const isActive = location.pathname === item.path;
-
-          return (
-            <NavLink
-              key={item.key}
-              to={item.path}
-              className={cn(
-                'flex flex-col items-center justify-center flex-1 h-full py-1 transition-all duration-150',
-                isActive
-                  ? 'text-primary scale-105 font-bold'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              <IconComp className="h-5 w-5 mb-0.5" />
-              <span className="text-[9px] uppercase font-bold tracking-wider">{item.key}</span>
-            </NavLink>
-          );
-        })}
-      </div>
     </>
   );
 }

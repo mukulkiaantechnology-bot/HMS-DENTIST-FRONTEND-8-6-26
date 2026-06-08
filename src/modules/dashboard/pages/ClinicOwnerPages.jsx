@@ -126,52 +126,52 @@ export function ClinicPatientsPage() {
 
   return (
     <div className="space-y-6 text-left">
-      <div className="flex items-center justify-between border-b border-border pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-4">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Users className="h-6 w-6 text-primary" />
+          <h2 className="text-lg md:text-xl lg:text-2xl font-extrabold flex items-center gap-2 text-foreground">
+            <Users className="h-5 w-5 md:h-6 md:w-6 text-primary" />
             Patients Registry
           </h2>
-          <p className="text-xs text-muted-foreground font-semibold">Manage clinical profiles and registration records for local clinic patients.</p>
+          <p className="text-[11px] md:text-xs text-muted-foreground font-semibold">Manage clinical profiles and registration records for local clinic patients.</p>
         </div>
-        <Button onClick={handleOpenAdd} className="gap-1.5">
+        <Button onClick={handleOpenAdd} className="gap-1.5 w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">
           <Plus className="h-4 w-4" />
           Add New Patient
         </Button>
       </div>
 
-      <div className="bg-card p-5 border border-border rounded-xl shadow-sm">
+      <div className="bg-card p-4 md:p-5 border border-border rounded-xl shadow-sm">
         <DataTable columns={columns} data={patients} searchKey="name" searchPlaceholder="Search patients by name..." pageSize={10} />
       </div>
 
       {/* Add Modal */}
       <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Register Patient Profile">
-        <form onSubmit={handleAddSubmit} className="space-y-4">
+        <form onSubmit={handleAddSubmit} className="space-y-4 flex flex-col h-full">
           <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. John Doe" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input label="Age" type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="e.g. 30" />
             <Input label="Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="e.g. (206) 555-1122" />
           </div>
           <Input label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="e.g. john@gmail.com" />
-          <div className="flex justify-end gap-2 pt-4 border-t border-border">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
-            <Button type="submit">Register Patient</Button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
+            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Register Patient</Button>
           </div>
         </form>
       </Modal>
 
       {/* Edit Modal */}
       <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="Modify Patient Profile">
-        <form onSubmit={handleEditSubmit} className="space-y-4">
+        <form onSubmit={handleEditSubmit} className="space-y-4 flex flex-col h-full">
           <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input label="Age" type="number" value={age} onChange={(e) => setAge(e.target.value)} />
             <Input label="Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
           <Input label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <div className="flex justify-end gap-2 pt-4 border-t border-border">
-            <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
-            <Button type="submit">Save Changes</Button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
+            <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Save Changes</Button>
           </div>
         </form>
       </Modal>
@@ -263,27 +263,27 @@ export function ClinicAppointmentsPage() {
 
   return (
     <div className="space-y-6 text-left">
-      <div className="flex items-center justify-between border-b border-border pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-4">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Calendar className="h-6 w-6 text-primary" />
+          <h2 className="text-lg md:text-xl lg:text-2xl font-extrabold flex items-center gap-2 text-foreground">
+            <Calendar className="h-5 w-5 md:h-6 md:w-6 text-primary" />
             Appointments Scheduler
           </h2>
-          <p className="text-xs text-muted-foreground font-semibold">Coordinate patient dental schedules and staff clinician calendar slots.</p>
+          <p className="text-[11px] md:text-xs text-muted-foreground font-semibold">Coordinate patient dental schedules and staff clinician calendar slots.</p>
         </div>
-        <Button onClick={handleOpenAdd} className="gap-1.5">
+        <Button onClick={handleOpenAdd} className="gap-1.5 w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">
           <Plus className="h-4 w-4" />
           Book Appointment
         </Button>
       </div>
 
-      <div className="bg-card p-5 border border-border rounded-xl shadow-sm">
+      <div className="bg-card p-4 md:p-5 border border-border rounded-xl shadow-sm">
         <DataTable columns={columns} data={appointments} searchKey="patientName" searchPlaceholder="Search by patient name..." pageSize={10} />
       </div>
 
       {/* Book Appointment Modal */}
       <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Schedule New Dental Appointment">
-        <form onSubmit={handleAddSubmit} className="space-y-4">
+        <form onSubmit={handleAddSubmit} className="space-y-4 flex flex-col h-full">
           <Select
             label="Select Patient"
             value={patientName}
@@ -311,9 +311,9 @@ export function ClinicAppointmentsPage() {
               { value: 'Dental Crown Placement', label: 'Prosthodontics (Crown)' }
             ]}
           />
-          <div className="flex justify-end gap-2 pt-4 border-t border-border">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
-            <Button type="submit">Book Slot</Button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
+            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Book Slot</Button>
           </div>
         </form>
       </Modal>
@@ -321,7 +321,7 @@ export function ClinicAppointmentsPage() {
       {/* Edit Appointment Modal */}
       <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="Reschedule Appointment Settings">
         {activeApt && (
-          <form onSubmit={handleEditSubmit} className="space-y-4">
+          <form onSubmit={handleEditSubmit} className="space-y-4 flex flex-col h-full">
             <Select
               label="Select Patient"
               value={patientName}
@@ -360,9 +360,9 @@ export function ClinicAppointmentsPage() {
                 { value: 'Cancelled', label: 'Cancelled' }
               ]}
             />
-            <div className="flex justify-end gap-2 pt-4 border-t border-border">
-              <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
-              <Button type="submit">Save Changes</Button>
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
+              <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
+              <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Save Changes</Button>
             </div>
           </form>
         )}
@@ -457,27 +457,27 @@ export function ClinicClinicalPage() {
 
   return (
     <div className="space-y-6 text-left">
-      <div className="flex items-center justify-between border-b border-border pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-4">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Stethoscope className="h-6 w-6 text-primary" />
+          <h2 className="text-lg md:text-xl lg:text-2xl font-extrabold flex items-center gap-2 text-foreground">
+            <Stethoscope className="h-5 w-5 md:h-6 md:w-6 text-primary" />
             Clinical Notes & Charting
           </h2>
-          <p className="text-xs text-muted-foreground font-semibold">Document dental diagnoses, charting graphs, and clinical procedure summaries.</p>
+          <p className="text-[11px] md:text-xs text-muted-foreground font-semibold">Document dental diagnoses, charting graphs, and clinical procedure summaries.</p>
         </div>
-        <Button onClick={handleOpenAdd} className="gap-1.5">
+        <Button onClick={handleOpenAdd} className="gap-1.5 w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">
           <Plus className="h-4 w-4" />
           Add Chart Entry
         </Button>
       </div>
 
-      <div className="bg-card p-5 border border-border rounded-xl shadow-sm">
+      <div className="bg-card p-4 md:p-5 border border-border rounded-xl shadow-sm">
         <DataTable columns={columns} data={clinicalNotes} searchKey="patientName" searchPlaceholder="Search by patient..." pageSize={10} />
       </div>
 
       {/* Add Modal */}
       <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Create Clinical Chart Entry">
-        <form onSubmit={handleAddSubmit} className="space-y-4">
+        <form onSubmit={handleAddSubmit} className="space-y-4 flex flex-col h-full">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Select
               label="Select Patient"
@@ -498,9 +498,9 @@ export function ClinicClinicalPage() {
           </div>
           <Input label="Treatment / Procedure Completed" value={treatment} onChange={(e) => setTreatment(e.target.value)} placeholder="e.g. Filling, Root canal extraction" required />
           <Input label="Detailed Practitioner Notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Enter details about anesthesia, composites, post-op..." />
-          <div className="flex justify-end gap-2 pt-4 border-t border-border">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
-            <Button type="submit">Save Entry</Button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
+            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Save Entry</Button>
           </div>
         </form>
       </Modal>
@@ -508,7 +508,7 @@ export function ClinicClinicalPage() {
       {/* Edit Modal */}
       <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="Modify Clinical Chart Settings">
         {activeNote && (
-          <form onSubmit={handleEditSubmit} className="space-y-4">
+          <form onSubmit={handleEditSubmit} className="space-y-4 flex flex-col h-full">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select
                 label="Select Patient"
@@ -530,9 +530,9 @@ export function ClinicClinicalPage() {
             </div>
             <Input label="Treatment" value={treatment} onChange={(e) => setTreatment(e.target.value)} required />
             <Input label="Detailed Notes" value={notes} onChange={(e) => setNotes(e.target.value)} />
-            <div className="flex justify-end gap-2 pt-4 border-t border-border">
-              <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
-              <Button type="submit">Save Changes</Button>
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
+              <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
+              <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Save Changes</Button>
             </div>
           </form>
         )}
@@ -695,27 +695,27 @@ export function ClinicStaffPage() {
 
   return (
     <div className="space-y-6 text-left">
-      <div className="flex items-center justify-between border-b border-border pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-4">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <UserCheck2 className="h-6 w-6 text-primary" />
+          <h2 className="text-lg md:text-xl lg:text-2xl font-extrabold flex items-center gap-2 text-foreground">
+            <UserCheck2 className="h-5 w-5 md:h-6 md:w-6 text-primary" />
             Clinic Staff Registry
           </h2>
-          <p className="text-xs text-muted-foreground font-semibold">Manage clinical and administrative employees registered for this clinic location.</p>
+          <p className="text-[11px] md:text-xs text-muted-foreground font-semibold">Manage clinical and administrative employees registered for this clinic location.</p>
         </div>
-        <Button onClick={handleOpenAdd} className="gap-1.5">
+        <Button onClick={handleOpenAdd} className="gap-1.5 w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">
           <Plus className="h-4 w-4" />
           Register Employee
         </Button>
       </div>
 
-      <div className="bg-card p-5 border border-border rounded-xl shadow-sm">
+      <div className="bg-card p-4 md:p-5 border border-border rounded-xl shadow-sm">
         <DataTable columns={columns} data={staff} searchKey="name" searchPlaceholder="Search employees by name..." pageSize={10} />
       </div>
 
       {/* Add Modal */}
       <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Register Clinic Employee">
-        <form onSubmit={handleAddSubmit} className="space-y-4">
+        <form onSubmit={handleAddSubmit} className="space-y-4 flex flex-col h-full">
           <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. Dr. Robert Miller" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Select
@@ -735,9 +735,9 @@ export function ClinicStaffPage() {
             <Input label="Phone Contact" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="e.g. (206) 555-4433" />
             <Input label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="e.g. robert@clinic.com" />
           </div>
-          <div className="flex justify-end gap-2 pt-4 border-t border-border">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
-            <Button type="submit">Create Employee</Button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
+            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Create Employee</Button>
           </div>
         </form>
       </Modal>
@@ -745,7 +745,7 @@ export function ClinicStaffPage() {
       {/* Edit Modal */}
       <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="Modify Employee Settings">
         {activeStf && (
-          <form onSubmit={handleEditSubmit} className="space-y-4">
+          <form onSubmit={handleEditSubmit} className="space-y-4 flex flex-col h-full">
             <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select
@@ -765,9 +765,9 @@ export function ClinicStaffPage() {
               <Input label="Phone Contact" value={phone} onChange={(e) => setPhone(e.target.value)} />
               <Input label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
-            <div className="flex justify-end gap-2 pt-4 border-t border-border">
-              <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
-              <Button type="submit">Save Changes</Button>
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
+              <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
+              <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Save Changes</Button>
             </div>
           </form>
         )}
@@ -808,19 +808,21 @@ export function ClinicReportsPage() {
 
   return (
     <div className="space-y-6 text-left">
-      <div className="border-b border-border pb-4">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <TrendingUp className="h-6 w-6 text-primary" />
-          Clinic Reports & Financials
-        </h2>
-        <p className="text-xs text-muted-foreground font-semibold">Review local clinic collections, procedural splits, and billing flows.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-4">
+        <div>
+          <h2 className="text-lg md:text-xl lg:text-2xl font-extrabold flex items-center gap-2 text-foreground">
+            <TrendingUp className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+            Clinic Reports & Financials
+          </h2>
+          <p className="text-[11px] md:text-xs text-muted-foreground font-semibold">Review local clinic collections, procedural splits, and billing flows.</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Collections Pie Chart */}
         <div className="bg-card border border-border p-5 rounded-2xl shadow-sm space-y-4">
           <h3 className="font-bold text-xs uppercase text-muted-foreground tracking-wider">Billing Collections Structure</h3>
-          <div className="h-[240px] w-full flex items-center justify-center">
+          <div className="h-64 lg:h-80 w-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={chartData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={4} dataKey="value">
@@ -838,7 +840,7 @@ export function ClinicReportsPage() {
         {/* Treatment breakdown Bar Chart */}
         <div className="bg-card border border-border p-5 rounded-2xl shadow-sm space-y-4">
           <h3 className="font-bold text-xs uppercase text-muted-foreground tracking-wider">Procedural Revenue Shares</h3>
-          <div className="h-[240px] w-full">
+          <div className="h-64 lg:h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={barChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-muted/40" />

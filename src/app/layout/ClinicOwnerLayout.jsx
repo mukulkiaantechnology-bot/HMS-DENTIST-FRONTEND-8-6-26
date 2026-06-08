@@ -1,21 +1,27 @@
+import { useState } from 'react';
 import { ClinicSidebar } from './ClinicSidebar';
 import { ClinicHeader } from './ClinicHeader';
 import { ToastContainer } from '../../shared/ui/Toast';
 import { Outlet } from 'react-router-dom';
 
 export function ClinicOwnerLayout({ children }) {
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
-      {/* Clinic Owner Collapsible Sidebar */}
-      <ClinicSidebar />
+      {/* Clinic Owner Collapsible Sidebar (Drawer on mobile) */}
+      <ClinicSidebar 
+        isMobileOpen={isMobileSidebarOpen} 
+        onClose={() => setIsMobileSidebarOpen(false)} 
+      />
 
       {/* Primary Work Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Scoped Clinic Header */}
-        <ClinicHeader />
+        {/* Scoped Clinic Header with Hamburger menu */}
+        <ClinicHeader onMenuClick={() => setIsMobileSidebarOpen(true)} />
 
         {/* Scrollable Workspace Container */}
-        <main className="flex-1 overflow-y-auto p-6 bg-background">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-background">
           <div className="max-w-7xl mx-auto w-full h-full flex flex-col">
             {children || <Outlet />}
           </div>
@@ -28,3 +34,4 @@ export function ClinicOwnerLayout({ children }) {
   );
 }
 export default ClinicOwnerLayout;
+

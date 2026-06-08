@@ -172,7 +172,8 @@ export function HygienistDashboardPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+            {/* Desktop Table View */}
+            <table className="hidden md:table w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-border/50 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
                   <th className="py-2.5">Time</th>
@@ -223,6 +224,52 @@ export function HygienistDashboardPage() {
                 ))}
               </tbody>
             </table>
+
+            {/* Mobile Card List View */}
+            <div className="flex flex-col gap-3 md:hidden">
+              {todaySchedule.map((appt) => (
+                <div key={appt.id} className="p-4 border border-border/80 rounded-2xl bg-card text-left space-y-3 shadow-sm">
+                  <div className="flex justify-between items-start gap-2">
+                    <div>
+                      <span className="text-xs font-black text-primary block">{appt.time}</span>
+                      <h4 className="font-extrabold text-sm text-foreground">{appt.name}</h4>
+                      <span className="text-[10px] text-muted-foreground font-semibold">ID: #{appt.patientId}</span>
+                    </div>
+                    <div>
+                      <select
+                        value={appt.status}
+                        onChange={(e) => handleStatusChange(appt.id, e.target.value)}
+                        className={`text-[10px] font-bold px-2.5 py-1 rounded-full bg-muted border border-border outline-none cursor-pointer ${
+                          appt.status === 'Completed'
+                            ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20'
+                            : appt.status === 'Arrived'
+                            ? 'text-primary bg-primary/10 border-primary/20'
+                            : 'text-amber-500 bg-amber-500/10 border-amber-500/20'
+                        }`}
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Arrived">Arrived</option>
+                        <option value="Completed">Completed</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="text-[11px] font-medium text-muted-foreground">
+                    <span className="font-semibold text-muted-foreground/75">Procedure:</span> {appt.type}
+                  </div>
+                  <div className="pt-2 border-t border-border/40">
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      onClick={() => handleStartSession(appt.patientId)}
+                      className="w-full font-bold text-xs h-10 cursor-pointer flex justify-center items-center gap-1.5"
+                    >
+                      <Play className="h-3.5 w-3.5 fill-current" />
+                      Open Perio Chart
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -292,7 +339,7 @@ export function HygienistDashboardPage() {
             <p className="text-[10px] text-muted-foreground font-semibold">Weekly distribution of routine prophylaxis vs deep periodontal cleanings.</p>
           </div>
           
-          <div className="h-[200px] w-full">
+          <div className="h-64 md:h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={monthlyWorkloadData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                 <defs>

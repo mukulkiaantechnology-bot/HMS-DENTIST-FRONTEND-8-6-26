@@ -129,60 +129,61 @@ export function BillingPage() {
   return (
     <div className="flex flex-col gap-6 w-full text-left">
       {/* Title Header */}
+      {/* Title Header */}
       <div>
-        <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Billing & Invoices</h1>
-        <p className="text-sm text-muted-foreground font-semibold mt-1">
+        <h1 className="text-lg md:text-xl lg:text-2xl font-extrabold text-foreground tracking-tight">Billing & Invoices</h1>
+        <p className="text-[11px] md:text-xs text-muted-foreground font-semibold mt-1">
           Review financial summaries, print clinical invoices, and process patient co-pays.
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {/* Total revenue */}
-        <div className="bg-card border border-border p-5 rounded-xl flex items-center justify-between shadow-sm">
+        <div className="bg-card border border-border p-4 md:p-5 rounded-xl flex items-center justify-between shadow-sm">
           <div className="space-y-1">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total Billed</span>
-            <h3 className="text-2xl font-bold text-foreground">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Total Billed</span>
+            <h3 className="text-xl md:text-2xl font-bold text-foreground">
               ${filteredInvoices.reduce((sum, inv) => sum + inv.amount, 0).toLocaleString()}
             </h3>
           </div>
-          <div className="bg-primary/10 text-primary p-3 rounded-lg dark:bg-primary/20">
+          <div className="bg-primary/10 text-primary p-2.5 rounded-lg dark:bg-primary/20">
             <Wallet className="h-5 w-5" />
           </div>
         </div>
 
         {/* Collected co-pays */}
-        <div className="bg-card border border-border p-5 rounded-xl flex items-center justify-between shadow-sm">
+        <div className="bg-card border border-border p-4 md:p-5 rounded-xl flex items-center justify-between shadow-sm">
           <div className="space-y-1">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total Received</span>
-            <h3 className="text-2xl font-bold text-foreground">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Total Received</span>
+            <h3 className="text-xl md:text-2xl font-bold text-foreground">
               ${filteredInvoices.reduce((sum, inv) => sum + inv.patientPaid + inv.insurancePaid, 0).toLocaleString()}
             </h3>
           </div>
-          <div className="bg-success/10 text-success p-3 rounded-lg dark:bg-success/20">
+          <div className="bg-success/10 text-success p-2.5 rounded-lg dark:bg-success/20">
             <Receipt className="h-5 w-5" />
           </div>
         </div>
 
         {/* Outstanding accounts */}
-        <div className="bg-card border border-border p-5 rounded-xl flex items-center justify-between shadow-sm">
+        <div className="bg-card border border-border p-4 md:p-5 rounded-xl flex items-center justify-between shadow-sm sm:col-span-2 md:col-span-1">
           <div className="space-y-1">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total Outstanding</span>
-            <h3 className="text-2xl font-bold text-destructive">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Total Outstanding</span>
+            <h3 className="text-xl md:text-2xl font-bold text-destructive">
               $
               {filteredInvoices
                 .reduce((sum, inv) => sum + (inv.amount - (inv.patientPaid + inv.insurancePaid)), 0)
                 .toLocaleString()}
             </h3>
           </div>
-          <div className="bg-destructive/10 text-destructive p-3 rounded-lg dark:bg-destructive/20">
+          <div className="bg-destructive/10 text-destructive p-2.5 rounded-lg dark:bg-destructive/20">
             <ShieldAlert className="h-5 w-5" />
           </div>
         </div>
       </div>
 
       {/* Main invoices grid */}
-      <div className="bg-card p-5 rounded-xl border border-border shadow-sm">
+      <div className="bg-card p-4 md:p-5 rounded-xl border border-border shadow-sm">
         <DataTable
           columns={columns}
           data={filteredInvoices}
@@ -195,7 +196,7 @@ export function BillingPage() {
       {/* Payment Gateway Dialog */}
       <Modal isOpen={isPayModalOpen} onClose={() => setIsPayModalOpen(false)} title="Simulate Payment Gateway">
         {selectedInvoice && (
-          <form onSubmit={handleProcessPayment} className="space-y-5">
+          <form onSubmit={handleProcessPayment} className="space-y-5 flex flex-col h-full">
             <div className="bg-muted/50 p-4 border border-border rounded-xl space-y-3">
               <div className="flex justify-between items-center text-xs">
                 <span className="font-semibold text-muted-foreground uppercase">Patient</span>
@@ -242,8 +243,8 @@ export function BillingPage() {
 
             {/* Payment Method Selector Grid */}
             <div className="space-y-1.5 text-left">
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Method of Payment</label>
-              <div className="grid grid-cols-2 gap-3">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Method of Payment</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   type="button"
                   className="flex items-center gap-2 p-3 border border-primary/20 bg-primary/5 rounded-xl text-left cursor-pointer focus:ring-2 focus:ring-primary"
@@ -262,11 +263,11 @@ export function BillingPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
-              <Button variant="outline" type="button" onClick={() => setIsPayModalOpen(false)}>
+            <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-2 pt-4 border-t border-border mt-auto">
+              <Button variant="outline" type="button" onClick={() => setIsPayModalOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 cursor-pointer">
                 Cancel
               </Button>
-              <Button type="submit">Process Co-Pay</Button>
+              <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 cursor-pointer">Process Co-Pay</Button>
             </div>
           </form>
         )}

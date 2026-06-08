@@ -128,7 +128,7 @@ export function BillingDashboardTab() {
       )}
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: "Today's Revenue", value: `$${todayRevenue.toFixed(2)}`, icon: DollarSign, color: 'primary', sub: 'Collected today' },
           { label: 'Pending Invoices', value: pendingInvoices, icon: Clock, color: 'amber', sub: 'Awaiting payment' },
@@ -164,20 +164,22 @@ export function BillingDashboardTab() {
         {/* Revenue Trend */}
         <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-5 shadow-sm">
           <h3 className="font-extrabold text-sm text-foreground mb-4">Monthly Revenue Trends</h3>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={MONTHLY_TREND} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="month" tick={{ fontSize: 10, fontWeight: 700 }} />
-              <YAxis tick={{ fontSize: 9, fontWeight: 700 }} />
-              <Tooltip
-                contentStyle={{ fontSize: 11, fontWeight: 700, borderRadius: 8, border: '1px solid var(--border)', background: 'var(--card)' }}
-                formatter={(v) => [`$${v}`, '']}
-              />
-              <Legend wrapperStyle={{ fontSize: 10, fontWeight: 700 }} />
-              <Bar dataKey="insurance" name="Insurance" fill="#6366f1" radius={[3, 3, 0, 0]} />
-              <Bar dataKey="patient" name="Patient" fill="#10b981" radius={[3, 3, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="h-64 lg:h-80 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={MONTHLY_TREND} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis dataKey="month" tick={{ fontSize: 10, fontWeight: 700 }} />
+                <YAxis tick={{ fontSize: 9, fontWeight: 700 }} />
+                <Tooltip
+                  contentStyle={{ fontSize: 11, fontWeight: 700, borderRadius: 8, border: '1px solid var(--border)', background: 'var(--card)' }}
+                  formatter={(v) => [`$${v}`, '']}
+                />
+                <Legend wrapperStyle={{ fontSize: 10, fontWeight: 700 }} />
+                <Bar dataKey="insurance" name="Insurance" fill="#6366f1" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="patient" name="Patient" fill="#10b981" radius={[3, 3, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Recent Transactions */}
@@ -344,16 +346,16 @@ export function BillingInvoicesTab() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="border-b border-border pb-4 flex items-center justify-between">
+      <div className="border-b border-border pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-black tracking-tight bg-gradient-to-r from-primary to-indigo-500 bg-clip-text text-transparent">Invoices</h2>
-          <p className="text-xs text-muted-foreground font-semibold">Create, manage, and track patient invoices with line-item breakdown.</p>
+          <h2 className="text-lg md:text-xl lg:text-2xl font-black tracking-tight bg-gradient-to-r from-primary to-indigo-500 bg-clip-text text-transparent">Invoices</h2>
+          <p className="text-[11px] md:text-xs text-muted-foreground font-semibold">Create, manage, and track patient invoices with line-item breakdown.</p>
         </div>
-        <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={handleDownloadCSV} className="font-bold text-xs gap-1.5 h-9">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button size="sm" variant="outline" onClick={handleDownloadCSV} className="font-bold text-xs gap-1.5 h-12 sm:h-9 w-full sm:w-auto cursor-pointer">
             <Download className="h-4 w-4" /> Export CSV
           </Button>
-          <Button size="sm" onClick={handleOpenCreate} className="font-bold text-xs gap-1.5 h-9">
+          <Button size="sm" onClick={handleOpenCreate} className="font-bold text-xs gap-1.5 h-12 sm:h-9 w-full sm:w-auto cursor-pointer">
             <Plus className="h-4 w-4" /> Create Invoice
           </Button>
         </div>
@@ -433,9 +435,9 @@ export function BillingInvoicesTab() {
             <div className="flex justify-between font-extrabold text-foreground border-t border-border pt-1.5"><span>Total Due</span><span className="text-primary">${total.toFixed(2)}</span></div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-border">
-            <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(false)} className="font-bold text-xs">Cancel</Button>
-            <Button type="submit" size="sm" className="font-bold text-xs">{editingInv ? 'Update Invoice' : 'Create Invoice'}</Button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
+            <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(false)} className="font-bold text-xs w-full sm:w-auto h-12 sm:h-10 cursor-pointer">Cancel</Button>
+            <Button type="submit" size="sm" className="font-bold text-xs w-full sm:w-auto h-12 sm:h-10 cursor-pointer">{editingInv ? 'Update Invoice' : 'Create Invoice'}</Button>
           </div>
         </form>
       </Modal>
@@ -590,9 +592,9 @@ export function BillingPaymentsTab() {
           <Input label="Payment Date *" type="date" value={payDate} onChange={(e) => setPayDate(e.target.value)} className="text-xs font-medium text-foreground" required />
           <Input label="Notes (optional)" value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. Co-pay at checkout, insurance reimbursement..." className="text-xs font-medium text-foreground" />
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-border">
-            <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(false)} className="font-bold text-xs">Cancel</Button>
-            <Button type="submit" size="sm" className="font-bold text-xs">Confirm Payment</Button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
+            <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(false)} className="font-bold text-xs w-full sm:w-auto h-12 sm:h-10 cursor-pointer">Cancel</Button>
+            <Button type="submit" size="sm" className="font-bold text-xs w-full sm:w-auto h-12 sm:h-10 cursor-pointer">Confirm Payment</Button>
           </div>
         </form>
       </Modal>
@@ -686,12 +688,12 @@ export function BillingClaimsTab() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="border-b border-border pb-4 flex items-center justify-between">
+      <div className="border-b border-border pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-black tracking-tight bg-gradient-to-r from-primary to-indigo-500 bg-clip-text text-transparent">Insurance Claims</h2>
-          <p className="text-xs text-muted-foreground font-semibold">Submit and track insurance claims from patient invoices.</p>
+          <h2 className="text-lg md:text-xl lg:text-2xl font-black tracking-tight bg-gradient-to-r from-primary to-indigo-500 bg-clip-text text-transparent">Insurance Claims</h2>
+          <p className="text-[11px] md:text-xs text-muted-foreground font-semibold">Submit and track insurance claims from patient invoices.</p>
         </div>
-        <Button size="sm" onClick={handleOpenCreate} className="font-bold text-xs gap-1.5 h-9">
+        <Button size="sm" onClick={handleOpenCreate} className="font-bold text-xs gap-1.5 h-12 sm:h-9 w-full sm:w-auto cursor-pointer">
           <Plus className="h-4 w-4" /> Submit Claim
         </Button>
       </div>
@@ -712,9 +714,9 @@ export function BillingClaimsTab() {
           <Input label="Insurance Carrier *" value={carrier} onChange={(e) => setCarrier(e.target.value)} placeholder="e.g. Blue Cross Blue Shield" className="text-xs font-medium text-foreground" required />
           <Input label="Claim Amount ($) *" type="number" step="0.01" value={claimAmount} onChange={(e) => setClaimAmount(e.target.value)} placeholder="0.00" className="text-xs font-medium text-foreground" required />
           <Input label="Notes" value={claimNote} onChange={(e) => setClaimNote(e.target.value)} placeholder="Claim notes or authorization details..." className="text-xs font-medium text-foreground" />
-          <div className="flex justify-end gap-2 pt-2 border-t border-border">
-            <Button type="button" variant="outline" size="sm" onClick={() => setIsCreateOpen(false)} className="font-bold text-xs">Cancel</Button>
-            <Button type="submit" size="sm" className="font-bold text-xs">Submit Claim</Button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
+            <Button type="button" variant="outline" size="sm" onClick={() => setIsCreateOpen(false)} className="font-bold text-xs w-full sm:w-auto h-12 sm:h-10 cursor-pointer">Cancel</Button>
+            <Button type="submit" size="sm" className="font-bold text-xs w-full sm:w-auto h-12 sm:h-10 cursor-pointer">Submit Claim</Button>
           </div>
         </form>
       </Modal>

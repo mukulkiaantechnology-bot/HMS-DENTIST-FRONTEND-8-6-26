@@ -21,7 +21,7 @@ export function Modal({ isOpen, onClose, title, children }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-4">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity duration-300 animate-fade-in"
@@ -29,17 +29,17 @@ export function Modal({ isOpen, onClose, title, children }) {
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-lg rounded-xl border border-border bg-card p-6 shadow-lg z-10 animate-scale-in text-left">
+      <div className="relative w-full h-full md:h-auto md:max-w-lg rounded-none md:rounded-xl border-none md:border border-border bg-card p-4 md:p-6 shadow-lg z-10 animate-scale-in text-left flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-border">
-          <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 hover:bg-muted rounded-full">
-            <X className="h-4 w-4" />
+        <div className="flex items-center justify-between pb-4 border-b border-border flex-shrink-0">
+          <h3 className="text-base md:text-lg font-extrabold text-foreground truncate">{title}</h3>
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-10 w-10 md:h-8 md:w-8 hover:bg-muted rounded-full cursor-pointer flex items-center justify-center">
+            <X className="h-5 w-5 md:h-4 md:w-4 text-muted-foreground hover:text-foreground" />
           </Button>
         </div>
 
         {/* Content */}
-        <div className="py-4 max-h-[70vh] overflow-y-auto pr-1">
+        <div className="flex-1 py-4 overflow-y-auto no-scrollbar md:max-h-[70vh]">
           {children}
         </div>
       </div>

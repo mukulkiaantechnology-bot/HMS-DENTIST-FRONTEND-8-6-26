@@ -258,7 +258,7 @@ export function SuperAdminDashboardPage() {
               6-Month Trend
             </Badge>
           </div>
-          <div className="h-[280px] w-full">
+          <div className="h-64 md:h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
@@ -291,7 +291,7 @@ export function SuperAdminDashboardPage() {
             <Sliders className="h-4.5 w-4.5 text-indigo-400" />
             Revenue Share distribution
           </h3>
-          <div className="h-[200px] w-full flex items-center justify-center">
+          <div className="h-52 md:h-[200px] w-full flex items-center justify-center">
             {selectedClinicId === 'all' ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -399,14 +399,15 @@ export function SuperAdminDashboardPage() {
         </h3>
         
         <div className="overflow-x-auto rounded-lg border border-border">
-          <table className="w-full text-sm text-left">
+          {/* Desktop Table View */}
+          <table className="hidden lg:table w-full text-sm text-left">
             <thead className="bg-muted text-xs uppercase tracking-wider text-muted-foreground border-b border-border select-none">
               <tr>
                 <th className="py-3 px-4 font-bold">Clinic Name</th>
                 <th className="py-3 px-4 font-bold">Plan</th>
                 <th className="py-3 px-4 font-bold">Monthly Fee</th>
                 <th className="py-3 px-4 font-bold">Patients</th>
-                <th className="py-3 px-4 font-bold">Revenue</th>
+                <th className="py-3 px-4 font-bold text-center">Revenue</th>
                 <th className="py-3 px-4 font-bold text-center">Score</th>
                 <th className="py-3 px-4 font-bold text-center">Diagnostic AI</th>
                 <th className="py-3 px-4 font-bold text-center">Recall SMS AI</th>
@@ -480,6 +481,102 @@ export function SuperAdminDashboardPage() {
               ))}
             </tbody>
           </table>
+
+          {/* Mobile Card List View */}
+          <div className="flex flex-col gap-3 lg:hidden p-1">
+            {clinics.map((c) => (
+              <div key={c.id} className="p-4 border border-border/80 rounded-2xl bg-card text-left space-y-4 shadow-sm">
+                <div className="flex justify-between items-start gap-2">
+                  <div>
+                    <h4 className="font-extrabold text-sm text-foreground">{c.name}</h4>
+                    <span className="block text-[10px] text-muted-foreground font-semibold mt-0.5">{c.location}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Badge variant={c.status === 'Active' ? 'success' : c.status === 'Trialing' ? 'info' : 'destructive'}>
+                      {c.status}
+                    </Badge>
+                    <button
+                      onClick={() => handleOpenEditLicense(c)}
+                      className="text-xs font-bold text-primary hover:underline cursor-pointer ml-1"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-xs border-t border-b border-border/40 py-2.5 my-1.5">
+                  <div>
+                    <span className="text-[10px] text-muted-foreground font-semibold block uppercase">SaaS Plan</span>
+                    <span className="font-semibold text-indigo-400">{c.plan}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-muted-foreground font-semibold block uppercase">Monthly Fee</span>
+                    <span className="font-extrabold text-foreground">${c.monthlyFee.toFixed(2)}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-muted-foreground font-semibold block uppercase">Patients</span>
+                    <span className="font-semibold text-foreground">{c.patients}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-muted-foreground font-semibold block uppercase">Revenue</span>
+                    <span className="font-extrabold text-foreground">${c.revenue.toLocaleString()}</span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-[10px] text-muted-foreground font-semibold block uppercase mb-0.5">Performance Score</span>
+                    <span className={`font-extrabold text-xs py-0.5 px-1.5 rounded-md ${
+                      c.performanceScore >= 90 ? 'bg-success/10 text-success' : c.performanceScore >= 80 ? 'bg-indigo-500/10 text-indigo-400' : 'bg-warning/10 text-warning'
+                    }`}>
+                      {c.performanceScore}%
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-between pt-1 text-xs">
+                  <div className="flex justify-between items-center gap-2 sm:flex-1">
+                    <div>
+                      <span className="font-bold text-foreground block text-[11px]">Diagnostic AI</span>
+                      <span className="text-[9px] text-muted-foreground font-semibold">Automatic bone loss detection</span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        toggleAiModule(c.id, 'diagnostic');
+                        toast.info(`Toggled AI Diagnostic module for ${c.name}.`);
+                      }}
+                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-250 cursor-pointer ${
+                        c.aiModules.diagnostic ? 'bg-primary' : 'bg-muted'
+                      }`}
+                    >
+                      <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-250 ${
+                        c.aiModules.diagnostic ? 'translate-x-4.5' : 'translate-x-1'
+                      }`} />
+                    </button>
+                  </div>
+
+                  <div className="h-px bg-border/40 sm:hidden" />
+
+                  <div className="flex justify-between items-center gap-2 sm:flex-1">
+                    <div>
+                      <span className="font-bold text-foreground block text-[11px]">Recall SMS AI</span>
+                      <span className="text-[9px] text-muted-foreground font-semibold">Generative reminders to overdue</span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        toggleAiModule(c.id, 'recallSMS');
+                        toast.info(`Toggled AI Recall SMS module for ${c.name}.`);
+                      }}
+                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-250 cursor-pointer ${
+                        c.aiModules.recallSMS ? 'bg-primary' : 'bg-muted'
+                      }`}
+                    >
+                      <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-250 ${
+                        c.aiModules.recallSMS ? 'translate-x-4.5' : 'translate-x-1'
+                      }`} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -516,11 +613,11 @@ export function SuperAdminDashboardPage() {
             ]}
           />
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
-            <Button variant="outline" type="button" onClick={() => setIsAddClinicOpen(false)}>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-4 w-full">
+            <Button variant="outline" type="button" onClick={() => setIsAddClinicOpen(false)} className="w-full sm:w-auto h-11 sm:h-10">
               Cancel
             </Button>
-            <Button type="submit">Register Location</Button>
+            <Button type="submit" className="w-full sm:w-auto h-11 sm:h-10">Register Location</Button>
           </div>
         </form>
       </Modal>
@@ -563,11 +660,11 @@ export function SuperAdminDashboardPage() {
               ]}
             />
 
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
-              <Button variant="outline" type="button" onClick={() => setIsEditLicenseOpen(false)}>
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-4 w-full">
+              <Button variant="outline" type="button" onClick={() => setIsEditLicenseOpen(false)} className="w-full sm:w-auto h-11 sm:h-10">
                 Cancel
               </Button>
-              <Button type="submit">Save Settings</Button>
+              <Button type="submit" className="w-full sm:w-auto h-11 sm:h-10">Save Settings</Button>
             </div>
           </form>
         )}

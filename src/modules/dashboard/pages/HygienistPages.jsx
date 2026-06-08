@@ -123,7 +123,7 @@ export function HygienistPatientDetailPage() {
   ];
 
   return (
-    <div className="space-y-6 text-left animate-fade-in flex-1 flex flex-col h-full">
+    <div className="space-y-6 text-left animate-fade-in flex-1 flex flex-col h-full min-w-0 w-full">
       {/* Patient Profile Card Header */}
       <div className="bg-card border border-border p-6 rounded-3xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-2">
@@ -178,7 +178,7 @@ export function HygienistPatientDetailPage() {
       </div>
 
       {/* Tab Contents */}
-      <div className="flex-1 bg-card border border-border p-6 rounded-3xl shadow-sm min-h-[450px]">
+      <div className="flex-1 bg-card border border-border p-6 rounded-3xl shadow-sm min-h-[450px] min-w-0 w-full overflow-hidden">
         {activeTab === 'overview' && <PatientOverviewTab patient={patient} risk={risk} />}
         {activeTab === 'perio' && <PerioChartingTab key={patient.id} patient={patient} />}
         {activeTab === 'risk' && <RiskAnalysisTab key={patient.id} patient={patient} />}
@@ -557,19 +557,19 @@ function RiskAnalysisTab({ patient }) {
             )}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2.5 w-full">
             <Button
               size="sm"
               variant="outline"
               onClick={handleTriggerAI}
-              className="flex-1 font-extrabold text-xs"
+              className="w-full sm:flex-1 font-extrabold text-xs h-10"
             >
               Evaluate AI Rules
             </Button>
             <Button
               size="sm"
               onClick={handleSaveRiskProfile}
-              className="flex-1 font-extrabold text-xs"
+              className="w-full sm:flex-1 font-extrabold text-xs h-10"
             >
               Save Assessment
             </Button>
@@ -652,7 +652,7 @@ function RecallSystemTab({ patient }) {
               variant="outline"
               disabled={recall.status === 'Scheduled'}
               onClick={handleSendReminder}
-              className="w-full text-xs font-bold gap-1.5"
+              className="w-full text-xs font-bold gap-1.5 h-10 cursor-pointer"
             >
               <Send className="h-3.5 w-3.5" />
               Send Reminder SMS/Email
@@ -661,7 +661,7 @@ function RecallSystemTab({ patient }) {
               size="sm"
               disabled={recall.status === 'Scheduled'}
               onClick={handleAutoSchedule}
-              className="w-full text-xs font-bold gap-1.5"
+              className="w-full text-xs font-bold gap-1.5 h-10 cursor-pointer"
             >
               <Calendar className="h-3.5 w-3.5" />
               Auto-Schedule Cleaning
@@ -910,13 +910,13 @@ export function HygienistRecallPage() {
       header: 'Recall Actions',
       align: 'right',
       render: (r) => (
-        <div className="flex gap-1.5 justify-end">
+        <div className="flex flex-col sm:flex-row gap-2 justify-end w-full">
           <Button
             size="xs"
             variant="outline"
             disabled={r.status === 'Scheduled'}
             onClick={() => handleSendReminder(r.id, r.patientName)}
-            className="font-extrabold text-[10px] h-8"
+            className="font-extrabold text-[10px] h-9 sm:h-8 w-full sm:w-auto justify-center"
           >
             <Send className="h-3 w-3 mr-1" />
             Send Reminder
@@ -925,7 +925,7 @@ export function HygienistRecallPage() {
             size="xs"
             disabled={r.status === 'Scheduled'}
             onClick={() => handleAutoSchedule(r.id, r.patientName)}
-            className="font-extrabold text-[10px] h-8"
+            className="font-extrabold text-[10px] h-9 sm:h-8 w-full sm:w-auto justify-center"
           >
             <Calendar className="h-3 w-3 mr-1" />
             Auto-Book
