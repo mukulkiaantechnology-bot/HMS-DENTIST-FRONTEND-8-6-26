@@ -71,9 +71,9 @@ export function DataTable({
           </thead>
           <tbody className="divide-y divide-border">
             {paginatedData.length > 0 ? (
-              paginatedData.map((item) => (
+              paginatedData.map((item, itemIdx) => (
                 <tr
-                  key={item.id || Math.random()}
+                  key={item.id || itemIdx}
                   className="hover:bg-muted/40 transition-colors duration-150"
                 >
                   {columns.map((col, idx) => (
@@ -109,9 +109,9 @@ export function DataTable({
       {/* Mobile Card Layout */}
       <div className="flex flex-col gap-4 md:hidden">
         {paginatedData.length > 0 ? (
-          paginatedData.map((item) => (
+          paginatedData.map((item, itemIdx) => (
             <div
-              key={item.id || Math.random()}
+              key={item.id || itemIdx}
               className="p-4 rounded-xl border border-border bg-card shadow-sm flex flex-col gap-3"
             >
               {columns.map((col, idx) => {
