@@ -48,12 +48,12 @@ export function TodayPatientsPage() {
         </div>
 
         {/* Status Filters */}
-        <div className="flex p-0.5 bg-muted rounded-xl border border-border w-fit">
+        <div className="flex p-0.5 bg-muted rounded-xl border border-border w-full sm:w-fit overflow-x-auto no-scrollbar flex-nowrap max-w-full shrink-0">
           {['All', 'Waiting', 'In Treatment', 'Completed'].map((s) => (
             <button
               key={s}
               onClick={() => setFilter(s)}
-              className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition-all cursor-pointer whitespace-nowrap ${
                 filter === s
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
