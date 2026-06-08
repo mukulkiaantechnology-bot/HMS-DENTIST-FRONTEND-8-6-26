@@ -1,0 +1,233 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { LandingPage } from '../../modules/auth/LandingPage';
+import { LoginPage } from '../../modules/auth/LoginPage';
+import { RegisterPage } from '../../modules/auth/RegisterPage';
+import { ProtectedRoute } from './ProtectedRoute';
+import { SuperAdminLayout } from '../layout/SuperAdminLayout';
+import { ClinicOwnerLayout } from '../layout/ClinicOwnerLayout';
+import { DentistLayout } from '../layout/DentistLayout';
+import { SuperAdminDashboardPage } from '../../modules/dashboard/pages/SuperAdminDashboardPage';
+import {
+  SuperAdminClinicsPage,
+  SuperAdminSubscriptionsPage,
+  SuperAdminBillingPage,
+  SuperAdminAIPage,
+  SuperAdminReportsPage,
+  SuperAdminUsersPage
+} from '../../modules/dashboard/pages/SuperAdminPages';
+import { ClinicOwnerDashboardPage } from '../../modules/dashboard/pages/ClinicOwnerDashboardPage';
+import {
+  ClinicPatientsPage,
+  ClinicAppointmentsPage,
+  ClinicClinicalPage,
+  ClinicBillingPage,
+  ClinicStaffPage,
+  ClinicReportsPage,
+  ClinicAIPage,
+  ClinicSettingsPage
+} from '../../modules/dashboard/pages/ClinicOwnerPages';
+import { DentistPatientsPage, PatientDetailPage } from '../../modules/dashboard/pages/DentistPages';
+import { DentistDashboardPage } from '../../modules/dashboard/pages/DentistDashboardPage';
+import { DentistAppointmentsPage } from '../../modules/dashboard/pages/DentistAppointmentsPage';
+import { useAuthStore } from '../../store/authStore';
+
+// Hygienist Imports
+import { HygienistLayout } from '../layout/HygienistLayout';
+import { HygienistDashboardPage } from '../../modules/dashboard/pages/HygienistDashboardPage';
+import { HygienistPatientsPage, HygienistPatientDetailPage, HygienistRecallPage } from '../../modules/dashboard/pages/HygienistPages';
+
+// Front Desk Imports
+import { FrontDeskLayout } from '../layout/FrontDeskLayout';
+import { FrontDeskDashboardPage } from '../../modules/dashboard/pages/FrontDeskDashboardPage';
+import {
+  FrontDeskAppointmentsPage,
+  FrontDeskRegistrationPage,
+  FrontDeskInsurancePage,
+  FrontDeskWaitlistPage
+} from '../../modules/dashboard/pages/FrontDeskPages';
+
+// Simple Not Found component styled with modern aesthetics
+function NotFoundPage() {
+  const user = useAuthStore((state) => state.user);
+  const dashboardPath = user?.role === 'clinic_owner'
+    ? '/clinic/dashboard'
+    : user?.role === 'dentist'
+    ? '/dentist/patients'
+    : user?.role === 'hygienist'
+    ? '/hygienist/dashboard'
+    : user?.role === 'front_desk' || user?.role === 'frontdesk'
+    ? '/frontdesk/dashboard'
+    : '/super-admin/dashboard';
+
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center min-h-[80vh] animate-fade-in text-left">
+      <h1 className="text-6xl font-extrabold text-primary select-none mb-2">404</h1>
+      <h2 className="text-xl font-bold text-foreground mb-2">Page Not Found</h2>
+      <p className="text-xs text-muted-foreground max-w-sm mb-6 font-semibold">
+        The path you are trying to visit does not exist or may have been archived.
+      </p>
+      <button
+        onClick={() => window.location.href = dashboardPath}
+        className="px-4 py-2 bg-primary text-primary-foreground font-semibold text-xs rounded-lg hover:bg-primary/95 cursor-pointer"
+      >
+        Go to Dashboard
+      </button>
+    </div>
+  );
+}
+
+export function AppRoutes() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
+
+  const getDashboardRedirect = () => {
+    if (!user) return '/login';
+    if (user.role === 'clinic_owner') return '/clinic/dashboard';
+    if (user.role === 'dentist') return '/dentist/patients';
+    if (user.role === 'hygienist') return '/hygienist/dashboard';
+    if (user.role === 'front_desk' || user.role === 'frontdesk') return '/frontdesk/dashboard';
+    return '/super-admin/dashboard';
+  };
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
+        <Route
+          path="/login"
+          element={
+            !isAuthenticated ? (
+              <LoginPage />
+            ) : (
+              <Navigate to={getDashboardRedirect()} replace />
+            )
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            !isAuthenticated ? (
+              <RegisterPage />
+            ) : (
+              <Navigate to={getDashboardRedirect()} replace />
+            )
+          }
+        />
+
+        {/* Super Admin Protected Routes Layout shell */}
+        <Route element={<SuperAdminLayout />}>
+          <Route element={<ProtectedRoute module="super_admin_dashboard" />}>
+            <Route path="/super-admin/dashboard" element={<SuperAdminDashboardPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="super_admin_clinics" />}>
+            <Route path="/super-admin/clinics" element={<SuperAdminClinicsPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="super_admin_users" />}>
+            <Route path="/super-admin/users" element={<SuperAdminUsersPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="super_admin_subscriptions" />}>
+            <Route path="/super-admin/subscriptions" element={<SuperAdminSubscriptionsPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="super_admin_billing" />}>
+            <Route path="/super-admin/billing" element={<SuperAdminBillingPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="super_admin_ai" />}>
+            <Route path="/super-admin/ai" element={<SuperAdminAIPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="super_admin_reports" />}>
+            <Route path="/super-admin/reports" element={<SuperAdminReportsPage />} />
+          </Route>
+
+          {/* 404 Route inside layout */}
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
+
+        {/* Clinic Owner Protected Routes Layout shell */}
+        <Route element={<ClinicOwnerLayout />}>
+          <Route element={<ProtectedRoute module="clinic_dashboard" />}>
+            <Route path="/clinic/dashboard" element={<ClinicOwnerDashboardPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="clinic_patients" />}>
+            <Route path="/clinic/patients" element={<ClinicPatientsPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="clinic_appointments" />}>
+            <Route path="/clinic/appointments" element={<ClinicAppointmentsPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="clinic_clinical" />}>
+            <Route path="/clinic/clinical" element={<ClinicClinicalPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="clinic_billing" />}>
+            <Route path="/clinic/billing" element={<ClinicBillingPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="clinic_staff" />}>
+            <Route path="/clinic/staff" element={<ClinicStaffPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="clinic_reports" />}>
+            <Route path="/clinic/reports" element={<ClinicReportsPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="clinic_ai" />}>
+            <Route path="/clinic/ai" element={<ClinicAIPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="clinic_settings" />}>
+            <Route path="/clinic/settings" element={<ClinicSettingsPage />} />
+          </Route>
+        </Route>
+
+        {/* Dentist Protected Routes Layout shell */}
+        <Route element={<DentistLayout />}>
+          <Route element={<ProtectedRoute module="dentist_dashboard" />}>
+            <Route path="/dentist" element={<Navigate to="/dentist/dashboard" replace />} />
+            <Route path="/dentist/dashboard" element={<DentistDashboardPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="dentist_appointments" />}>
+            <Route path="/dentist/appointments" element={<DentistAppointmentsPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="dentist_patients" />}>
+            <Route path="/dentist/patients" element={<DentistPatientsPage />} />
+            <Route path="/dentist/patients/:id" element={<PatientDetailPage />} />
+          </Route>
+        </Route>
+
+        {/* Hygienist Protected Routes Layout shell */}
+        <Route element={<HygienistLayout />}>
+          <Route element={<ProtectedRoute module="hygienist_dashboard" />}>
+            <Route path="/hygienist" element={<Navigate to="/hygienist/dashboard" replace />} />
+            <Route path="/hygienist/dashboard" element={<HygienistDashboardPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="hygienist_patients" />}>
+            <Route path="/hygienist/patients" element={<HygienistPatientsPage />} />
+            <Route path="/hygienist/patients/:id" element={<HygienistPatientDetailPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="hygienist_recall" />}>
+            <Route path="/hygienist/recall" element={<HygienistRecallPage />} />
+          </Route>
+        </Route>
+
+        {/* Redirect for /rehygienist/* → Hygienist System */}
+        <Route path="/rehygienist/*" element={<Navigate to="/hygienist/dashboard" replace />} />
+
+        {/* Front Desk Protected Routes Layout shell */}
+        <Route element={<FrontDeskLayout />}>
+          <Route element={<ProtectedRoute module="frontdesk_dashboard" />}>
+            <Route path="/frontdesk" element={<Navigate to="/frontdesk/dashboard" replace />} />
+            <Route path="/frontdesk/dashboard" element={<FrontDeskDashboardPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="frontdesk_appointments" />}>
+            <Route path="/frontdesk/appointments" element={<FrontDeskAppointmentsPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="frontdesk_registration" />}>
+            <Route path="/frontdesk/registration" element={<FrontDeskRegistrationPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="frontdesk_insurance" />}>
+            <Route path="/frontdesk/insurance" element={<FrontDeskInsurancePage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="frontdesk_waitlist" />}>
+            <Route path="/frontdesk/waitlist" element={<FrontDeskWaitlistPage />} />
+          </Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}
+export default AppRoutes;
