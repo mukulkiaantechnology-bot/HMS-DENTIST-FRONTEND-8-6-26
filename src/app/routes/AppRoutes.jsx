@@ -50,6 +50,20 @@ import {
 import { BillingLayout } from '../layout/BillingLayout';
 import { BillingPage } from '../../modules/billing/pages/BillingPage';
 
+// Dental Assistant Imports
+import { DentalAssistantLayout } from '../layout/DentalAssistantLayout';
+import { TodayPatientsPage } from '../../modules/assistant/pages/TodayPatientsPage';
+import { XrayUploadPage } from '../../modules/assistant/pages/XrayUploadPage';
+import { ChairsideToolsPage } from '../../modules/assistant/pages/ChairsideToolsPage';
+import { ClinicalNotesPage } from '../../modules/assistant/pages/ClinicalNotesPage';
+
+// Lab Coordinator Imports
+import { LabCoordinatorLayout } from '../layout/LabCoordinatorLayout';
+import { LabCasesPage } from '../../modules/lab/pages/LabCasesPage';
+import { CrownTrackingPage } from '../../modules/lab/pages/CrownTrackingPage';
+import { ImplantCasesPage } from '../../modules/lab/pages/ImplantCasesPage';
+import { StatusBoardPage } from '../../modules/lab/pages/StatusBoardPage';
+
 // Simple Not Found component styled with modern aesthetics
 function NotFoundPage() {
   const user = useAuthStore((state) => state.user);
@@ -63,6 +77,10 @@ function NotFoundPage() {
     ? '/frontdesk/dashboard'
     : user?.role === 'billing_staff'
     ? '/billing'
+    : user?.role === 'dental_assistant' || user?.role === 'assistant'
+    ? '/assistant/patients'
+    : user?.role === 'lab_coordinator'
+    ? '/lab/cases'
     : '/super-admin/dashboard';
 
   return (
@@ -93,6 +111,8 @@ export function AppRoutes() {
     if (user.role === 'hygienist') return '/hygienist/dashboard';
     if (user.role === 'front_desk' || user.role === 'frontdesk') return '/frontdesk/dashboard';
     if (user.role === 'billing_staff') return '/billing';
+    if (user.role === 'dental_assistant' || user.role === 'assistant') return '/assistant/patients';
+    if (user.role === 'lab_coordinator') return '/lab/cases';
     return '/super-admin/dashboard';
   };
 
@@ -238,6 +258,40 @@ export function AppRoutes() {
         <Route element={<BillingLayout />}>
           <Route element={<ProtectedRoute module="billing_hub" />}>
             <Route path="/billing" element={<BillingPage />} />
+          </Route>
+        </Route>
+
+        {/* Dental Assistant Protected Routes Layout shell */}
+        <Route element={<DentalAssistantLayout />}>
+          <Route element={<ProtectedRoute module="assistant_patients" />}>
+            <Route path="/assistant" element={<Navigate to="/assistant/patients" replace />} />
+            <Route path="/assistant/patients" element={<TodayPatientsPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="assistant_xray" />}>
+            <Route path="/assistant/xray" element={<XrayUploadPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="assistant_chairside" />}>
+            <Route path="/assistant/chairside" element={<ChairsideToolsPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="assistant_notes" />}>
+            <Route path="/assistant/notes" element={<ClinicalNotesPage />} />
+          </Route>
+        </Route>
+
+        {/* Lab Coordinator Protected Routes Layout shell */}
+        <Route element={<LabCoordinatorLayout />}>
+          <Route element={<ProtectedRoute module="lab_cases" />}>
+            <Route path="/lab" element={<Navigate to="/lab/cases" replace />} />
+            <Route path="/lab/cases" element={<LabCasesPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="lab_crown" />}>
+            <Route path="/lab/crown" element={<CrownTrackingPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="lab_implant" />}>
+            <Route path="/lab/implant" element={<ImplantCasesPage />} />
+          </Route>
+          <Route element={<ProtectedRoute module="lab_status" />}>
+            <Route path="/lab/status" element={<StatusBoardPage />} />
           </Route>
         </Route>
       </Routes>

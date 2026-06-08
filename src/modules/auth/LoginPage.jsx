@@ -37,6 +37,12 @@ export function LoginPage() {
     } else if (val === 'billing_staff') {
       setEmail('billing@vancedental.com');
       setPassword('password123');
+    } else if (val === 'dental_assistant') {
+      setEmail('assistant@vancedental.com');
+      setPassword('password123');
+    } else if (val === 'lab_coordinator') {
+      setEmail('lab@vancedental.com');
+      setPassword('password123');
     }
   };
 
@@ -67,6 +73,12 @@ export function LoginPage() {
       } else if (result.role === 'billing_staff') {
         toast.success('Successfully signed in as Billing Staff Coordinator', 'Billing Workspace Enabled');
         navigate('/billing');
+      } else if (result.role === 'dental_assistant' || result.role === 'assistant') {
+        toast.success('Successfully signed in as Dental Assistant', 'Assistant Workspace Enabled');
+        navigate('/assistant/patients');
+      } else if (result.role === 'lab_coordinator') {
+        toast.success('Successfully signed in as Lab Coordinator', 'Lab Workspace Enabled');
+        navigate('/lab/cases');
       } else {
         toast.warning(`Role "${result.role}" is currently running in simulated environment.`);
       }
@@ -82,7 +94,9 @@ export function LoginPage() {
     { value: 'dentist', label: 'Dentist - Dr. Michael Chen (dr.chen@vancedental.com)' },
     { value: 'hygienist', label: 'Hygienist - Elena Rostova, RDH (elena.r@vancedental.com)' },
     { value: 'front_desk', label: 'Front Desk - Amara Lopez (amara.reception@vancedental.com)' },
-    { value: 'billing_staff', label: 'Billing Staff - Samantha Billing (billing@vancedental.com)' }
+    { value: 'billing_staff', label: 'Billing Staff - Samantha Billing (billing@vancedental.com)' },
+    { value: 'dental_assistant', label: 'Dental Assistant - David Miller (assistant@vancedental.com)' },
+    { value: 'lab_coordinator', label: 'Lab Coordinator - Marcus Vance (lab@vancedental.com)' }
   ];
 
   return (
