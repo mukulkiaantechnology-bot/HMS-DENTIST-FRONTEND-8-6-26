@@ -41,7 +41,16 @@ export const MODULE_ROUTES = [
   { module: 'frontdesk_appointments', path: '/frontdesk/appointments', label: 'Appointments', icon: 'Calendar' },
   { module: 'frontdesk_registration', path: '/frontdesk/registration', label: 'Patient Registration', icon: 'UserPlus' },
   { module: 'frontdesk_insurance', path: '/frontdesk/insurance', label: 'Insurance Verification', icon: 'FileShield' },
-  { module: 'frontdesk_waitlist', path: '/frontdesk/waitlist', label: 'Waitlist', icon: 'Clock' }
+  { module: 'frontdesk_waitlist', path: '/frontdesk/waitlist', label: 'Waitlist', icon: 'Clock' },
+
+  // Billing Staff Modules
+  { module: 'billing_hub', path: '/billing', label: 'Billing Hub', icon: 'CreditCard' },
+
+  // Dental Assistant Modules
+  { module: 'assistant_patients', path: '/assistant/patients', label: 'Today Patients', icon: 'Users' },
+  { module: 'assistant_xray', path: '/assistant/xray', label: 'X-Ray Upload', icon: 'Image' },
+  { module: 'assistant_chairside', path: '/assistant/chairside', label: 'Chairside Tools', icon: 'Activity' },
+  { module: 'assistant_notes', path: '/assistant/notes', label: 'Clinical Notes', icon: 'FileText' }
 ];
 
 export const ROLE_PERMISSIONS = {
@@ -95,6 +104,21 @@ export const ROLE_PERMISSIONS = {
     'frontdesk_registration',
     'frontdesk_insurance',
     'frontdesk_waitlist'
+  ],
+  billing_staff: [
+    'billing_hub'
+  ],
+  dental_assistant: [
+    'assistant_patients',
+    'assistant_xray',
+    'assistant_chairside',
+    'assistant_notes'
+  ],
+  assistant: [
+    'assistant_patients',
+    'assistant_xray',
+    'assistant_chairside',
+    'assistant_notes'
   ]
 };
 
@@ -114,4 +138,7 @@ export const ROLE_LABELS = {
   hygienist: 'Dental Hygienist (RDH)',
   front_desk: 'Clinic Front Desk (Reception)',
   frontdesk: 'Clinic Front Desk (Reception)',
+  billing_staff: 'Billing Staff Coordinator',
+  dental_assistant: 'Dental Assistant',
+  assistant: 'Dental Assistant'
 };

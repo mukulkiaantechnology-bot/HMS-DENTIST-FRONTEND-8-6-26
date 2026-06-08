@@ -73,11 +73,13 @@ export const useAuthStore = create((set) => ({
   login: (role, clinicId) => {
     const defaultEmails = {
       super_admin: 's.jenkins@hms-saas.com',
-      clinic_owner: 'owner@vancedental.com'
+      clinic_owner: 'owner@vancedental.com',
+      billing_staff: 'billing@vancedental.com'
     };
     const defaultNames = {
       super_admin: 'Sarah Jenkins',
-      clinic_owner: 'Dr. Arthur Vance'
+      clinic_owner: 'Dr. Arthur Vance',
+      billing_staff: 'Samantha Billing'
     };
     const profile = {
       name: defaultNames[role] || 'User',

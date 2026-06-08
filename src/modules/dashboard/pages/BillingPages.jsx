@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   DollarSign,
   TrendingUp,
@@ -9,7 +10,6 @@ import {
   Edit2,
   Download,
   FileText,
-  CreditCard,
   ShieldCheck,
   Receipt,
   CheckCircle2,
@@ -24,8 +24,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
   Legend
 } from 'recharts';
 import { useBillingStore } from '../../../store/billingStore';
@@ -211,13 +209,14 @@ export function BillingInvoicesTab() {
   const { invoices, createInvoice, updateInvoice, deleteInvoice } = useBillingStore();
   const { patients } = usePatientStore();
   const toast = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(() => searchParams.get('action') === 'create-invoice');
   const [editingInv, setEditingInv] = useState(null);
 
   // Form state
-  const [patientId, setPatientId] = useState('');
-  const [date, setDate] = useState('');
+  const [patientId, setPatientId] = useState(() => patients[0]?.id || '');
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [dueDate, setDueDate] = useState('');
   const [taxPct, setTaxPct] = useState('5');
   const [discountAmt, setDiscountAmt] = useState('0');
@@ -239,6 +238,14 @@ export function BillingInvoicesTab() {
     resetForm();
     setIsOpen(true);
   };
+
+  useEffect(() => {
+    if (searchParams.get('action') === 'create-invoice') {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('action');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleOpenEdit = (inv) => {
     setEditingInv(inv);
@@ -449,22 +456,23 @@ export function BillingInvoicesTab() {
 export function BillingPaymentsTab() {
   const { payments, invoices, recordPayment, deletePayment } = useBillingStore();
   const toast = useToast();
-
-  const [isOpen, setIsOpen] = useState(false);
-  const [invoiceId, setInvoiceId] = useState('');
-  const [amount, setAmount] = useState('');
-  const [method, setMethod] = useState('Card');
-  const [payDate, setPayDate] = useState(new Date().toISOString().split('T')[0]);
-  const [note, setNote] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Filter for month-wise download
   const [filterMonth, setFilterMonth] = useState(new Date().getMonth() + 1);
   const [filterYear, setFilterYear] = useState(new Date().getFullYear());
 
+  const openPayables = useMemo(() => invoices.filter((inv) => inv.status !== 'Paid'), [invoices]);
+
+  const [isOpen, setIsOpen] = useState(() => searchParams.get('action') === 'record-payment');
+  const [invoiceId, setInvoiceId] = useState(() => openPayables[0]?.id || '');
+  const [amount, setAmount] = useState('');
+  const [method, setMethod] = useState('Card');
+  const [payDate, setPayDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [note, setNote] = useState('');
+
   const selectedInvoice = useMemo(() => invoices.find((inv) => inv.id === invoiceId), [invoices, invoiceId]);
   const balance = useMemo(() => selectedInvoice ? Math.max(0, selectedInvoice.amount - (selectedInvoice.patientPaid || 0) - (selectedInvoice.insurancePaid || 0)) : 0, [selectedInvoice]);
-
-  const openPayables = useMemo(() => invoices.filter((inv) => inv.status !== 'Paid'), [invoices]);
 
   const handleOpenRecord = () => {
     setInvoiceId(openPayables[0]?.id || '');
@@ -474,6 +482,14 @@ export function BillingPaymentsTab() {
     setNote('');
     setIsOpen(true);
   };
+
+  useEffect(() => {
+    if (searchParams.get('action') === 'record-payment') {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('action');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
