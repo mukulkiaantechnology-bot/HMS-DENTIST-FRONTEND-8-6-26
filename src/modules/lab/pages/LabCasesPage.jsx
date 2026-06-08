@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Folder, Plus, Search, Calendar, FileText, CheckCircle2, ArrowRight, User, AlertCircle } from 'lucide-react';
+import { Folder, Plus, Search, Calendar, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useLabStore } from '../../../store/labStore';
 import { Button } from '../../../shared/ui/Button';
 import { Badge } from '../../../shared/ui/Badge';

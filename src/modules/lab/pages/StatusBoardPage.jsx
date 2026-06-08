@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
-import { Columns, Calendar, Tag, User, ArrowRight, ArrowLeft, ArrowUpRight, FlaskConical, AlertCircle } from 'lucide-react';
+import { Columns, Calendar, User, ArrowRight, ArrowLeft, FlaskConical, AlertCircle } from 'lucide-react';
 import { useLabStore } from '../../../store/labStore';
-import { Button } from '../../../shared/ui/Button';
 import { Badge } from '../../../shared/ui/Badge';
 import { useToast } from '../../../shared/hooks/useToast';
 
