@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { Sun, Moon, LogOut, Users, AlertTriangle, Menu } from 'lucide-react';
+import { Sun, Moon, LogOut, Users, AlertTriangle, Menu, Sparkles } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useHygienistStore } from '../../store/hygienistStore';
 import { HygienistSidebar } from './HygienistSidebar';
@@ -74,6 +74,11 @@ export function HygienistLayout({ children }) {
             >
               <Menu className="h-5 w-5" />
             </button>
+
+            {/* Brand Logo for Mobile Header */}
+            <div className="md:hidden bg-primary text-primary-foreground p-1.5 rounded-lg flex-shrink-0">
+              <Sparkles className="h-4.5 w-4.5" />
+            </div>
 
             {/* Active Patient switcher context */}
             <div className="flex items-center gap-1.5 md:gap-2 bg-muted/60 border border-border px-2 md:px-3 py-1 rounded-xl max-w-[160px] sm:max-w-none">

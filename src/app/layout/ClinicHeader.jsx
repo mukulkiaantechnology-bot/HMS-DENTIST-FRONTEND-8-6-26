@@ -49,6 +49,11 @@ export function ClinicHeader({ onMenuClick }) {
           <Menu className="h-5 w-5" />
         </button>
 
+        {/* Brand Logo for Mobile Header */}
+        <div className="md:hidden bg-primary text-primary-foreground p-1.5 rounded-lg flex-shrink-0">
+          <Building2 className="h-4.5 w-4.5" />
+        </div>
+
         <div className="bg-primary/10 text-primary p-2 rounded-lg hidden sm:block">
           <Building2 className="h-5 w-5" />
         </div>

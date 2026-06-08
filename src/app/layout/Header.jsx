@@ -59,6 +59,11 @@ export function Header({ onMenuClick }) {
           <Menu className="h-5 w-5" />
         </button>
 
+        {/* Brand Logo for Mobile Header */}
+        <div className="md:hidden bg-primary text-primary-foreground p-1.5 rounded-lg flex-shrink-0">
+          <Building2 className="h-4.5 w-4.5" />
+        </div>
+
         <Building2 className="h-4 w-4 text-muted-foreground hidden sm:block" />
         <div className="relative">
           <select

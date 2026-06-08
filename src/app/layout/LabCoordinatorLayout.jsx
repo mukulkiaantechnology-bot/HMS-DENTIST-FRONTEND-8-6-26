@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
-import { Sun, Moon, LogOut, Tag, AlertTriangle } from 'lucide-react';
+import { Sun, Moon, LogOut, Tag, AlertTriangle, Menu, FlaskConical } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useLabStore } from '../../store/labStore';
 import { LabSidebar } from './LabSidebar';
@@ -11,6 +11,7 @@ export function LabCoordinatorLayout({ children }) {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const { labCases, activeCaseId, setActiveCaseId } = useLabStore();
 
@@ -49,20 +50,37 @@ export function LabCoordinatorLayout({ children }) {
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground select-none">
       {/* Sidebar */}
-      <LabSidebar />
+      <LabSidebar 
+        isMobileOpen={isMobileSidebarOpen}
+        onClose={() => setIsMobileSidebarOpen(false)}
+      />
 
       {/* Main Panel */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Scoped Patient Header */}
-        <header className="h-16 border-b border-border bg-card text-foreground px-4 sm:px-6 flex items-center justify-between z-20">
-          <div className="flex items-center gap-4 flex-1">
+        <header className="h-16 border-b border-border bg-card text-foreground px-4 md:px-6 flex items-center justify-between z-20 flex-shrink-0">
+          <div className="flex items-center gap-2 md:gap-4 flex-1 overflow-hidden">
+            {/* Mobile menu toggle */}
+            <button
+              onClick={() => setIsMobileSidebarOpen(true)}
+              className="md:hidden p-2 -ml-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer focus:outline-none"
+              title="Open Menu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+
+            {/* Brand Logo for Mobile Header */}
+            <div className="md:hidden bg-primary text-primary-foreground p-1.5 rounded-lg flex-shrink-0">
+              <FlaskConical className="h-4.5 w-4.5" />
+            </div>
+
             {/* Active Case switcher context */}
-            <div className="flex items-center gap-2 bg-muted/60 border border-border px-3 py-1 rounded-xl">
-              <Tag className="h-4 w-4 text-primary" />
+            <div className="flex items-center gap-1.5 md:gap-2 bg-muted/60 border border-border px-2 md:px-3 py-1 rounded-xl max-w-[160px] sm:max-w-none">
+              <Tag className="h-3.5 w-3.5 text-primary flex-shrink-0" />
               <select
                 value={activeCaseId || ''}
                 onChange={handleCaseChange}
-                className="bg-transparent border-none text-xs font-bold focus:outline-none cursor-pointer max-w-[200px] text-foreground"
+                className="bg-transparent border-none text-[10px] md:text-xs font-bold focus:outline-none cursor-pointer max-w-[110px] sm:max-w-[180px] text-foreground py-0.5"
               >
                 <option value="" disabled className="bg-card">-- Select Case --</option>
                 {labCases.map((c) => (
