@@ -193,12 +193,9 @@ export const useLabStore = create((set, get) => ({
   updateCrownTracking: (caseId, crownInfo) => {
     set((state) => {
       const exists = state.crownCases.some((c) => c.caseId === caseId);
-      let nextCrowns = [];
-      if (exists) {
-        nextCrowns = state.crownCases.map((c) => (c.caseId === caseId ? { ...c, ...crownInfo } : c));
-      } else {
-        nextCrowns = [...state.crownCases, { caseId, ...crownInfo }];
-      }
+      const nextCrowns = exists
+        ? state.crownCases.map((c) => (c.caseId === caseId ? { ...c, ...crownInfo } : c))
+        : [...state.crownCases, { caseId, ...crownInfo }];
       return { crownCases: nextCrowns };
     });
   },
@@ -207,12 +204,9 @@ export const useLabStore = create((set, get) => ({
   updateImplantStage: (caseId, implantInfo) => {
     set((state) => {
       const exists = state.implantCases.some((i) => i.caseId === caseId);
-      let nextImplants = [];
-      if (exists) {
-        nextImplants = state.implantCases.map((i) => (i.caseId === caseId ? { ...i, ...implantInfo } : i));
-      } else {
-        nextImplants = [...state.implantCases, { caseId, ...implantInfo }];
-      }
+      const nextImplants = exists
+        ? state.implantCases.map((i) => (i.caseId === caseId ? { ...i, ...implantInfo } : i))
+        : [...state.implantCases, { caseId, ...implantInfo }];
 
       // If implant stage updates to 'Ready' or 'Delivered', keep in sync with case status
       const relatedCase = state.labCases.find((c) => c.id === caseId);

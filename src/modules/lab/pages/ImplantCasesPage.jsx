@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Wrench, CheckCircle2, ChevronRight, Activity, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Wrench, CheckCircle2, ChevronRight, Activity, ShieldCheck, AlertCircle, Save } from 'lucide-react';
 import { useLabStore } from '../../../store/labStore';
 import { Button } from '../../../shared/ui/Button';
 import { Input } from '../../../shared/ui/Input';
@@ -28,16 +28,6 @@ export function ImplantCasesPage() {
   const [planningNotes, setPlanningNotes] = useState(() => activeImplantDetails?.planningNotes || '');
   const [dimensions, setDimensions] = useState(() => activeImplantDetails?.dimensions || 'Platform: 4.5mm, Length: 10.0mm');
   const [surgicalNotes, setSurgicalNotes] = useState(() => activeImplantDetails?.surgicalNotes || '');
-
-  // Keep state in sync when active case changes
-  useMemo(() => {
-    if (activeImplantDetails) {
-      setStage(activeImplantDetails.stage);
-      setPlanningNotes(activeImplantDetails.planningNotes);
-      setDimensions(activeImplantDetails.dimensions);
-      setSurgicalNotes(activeImplantDetails.surgicalNotes);
-    }
-  }, [activeImplantDetails]);
 
   const handleSaveImplant = (e) => {
     e.preventDefault();
@@ -70,7 +60,7 @@ export function ImplantCasesPage() {
   };
 
   return (
-    <div className="space-y-6 text-left animate-fade-in pb-16 md:pb-0">
+    <div key={activeCaseId} className="space-y-6 text-left animate-fade-in pb-16 md:pb-0">
       {/* Header */}
       <div className="border-b border-border pb-4">
         <h2 className="text-2xl font-black tracking-tight flex items-center gap-2 text-foreground">

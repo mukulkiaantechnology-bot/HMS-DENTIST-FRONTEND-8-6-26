@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react';
 import { Layers, Activity, Save, CheckCircle2, ChevronRight, MessageSquare, AlertCircle } from 'lucide-react';
 import { useLabStore } from '../../../store/labStore';
 import { Button } from '../../../shared/ui/Button';
-import { Input } from '../../../shared/ui/Input';
 import { useToast } from '../../../shared/hooks/useToast';
 
 export function CrownTrackingPage() {
@@ -28,16 +27,6 @@ export function CrownTrackingPage() {
   const [material, setMaterial] = useState(() => activeCrownDetails?.material || 'Ceramic');
   const [shade, setShade] = useState(() => activeCrownDetails?.shade || 'A2');
   const [notes, setNotes] = useState(() => activeCrownDetails?.notes || '');
-
-  // Keep state in sync when active case changes
-  useMemo(() => {
-    if (activeCrownDetails) {
-      setToothNumber(activeCrownDetails.toothNumber);
-      setMaterial(activeCrownDetails.material);
-      setShade(activeCrownDetails.shade);
-      setNotes(activeCrownDetails.notes);
-    }
-  }, [activeCrownDetails]);
 
   const handleSaveTracking = (e) => {
     e.preventDefault();
@@ -69,7 +58,7 @@ export function CrownTrackingPage() {
   const teethLower = Array.from({ length: 16 }, (_, i) => String(32 - i));
 
   return (
-    <div className="space-y-6 text-left animate-fade-in pb-16 md:pb-0">
+    <div key={activeCaseId} className="space-y-6 text-left animate-fade-in pb-16 md:pb-0">
       {/* Header */}
       <div className="border-b border-border pb-4">
         <h2 className="text-2xl font-black tracking-tight flex items-center gap-2 text-foreground">
