@@ -50,7 +50,13 @@ export const MODULE_ROUTES = [
   { module: 'assistant_patients', path: '/assistant/patients', label: 'Today Patients', icon: 'Users' },
   { module: 'assistant_xray', path: '/assistant/xray', label: 'X-Ray Upload', icon: 'Image' },
   { module: 'assistant_chairside', path: '/assistant/chairside', label: 'Chairside Tools', icon: 'Activity' },
-  { module: 'assistant_notes', path: '/assistant/notes', label: 'Clinical Notes', icon: 'FileText' }
+  { module: 'assistant_notes', path: '/assistant/notes', label: 'Clinical Notes', icon: 'FileText' },
+
+  // Lab Coordinator Modules
+  { module: 'lab_cases', path: '/lab/cases', label: 'Lab Cases', icon: 'Folder' },
+  { module: 'lab_crown', path: '/lab/crown', label: 'Crown Tracking', icon: 'Layers' },
+  { module: 'lab_implant', path: '/lab/implant', label: 'Implant Cases', icon: 'Wrench' },
+  { module: 'lab_status', path: '/lab/status', label: 'Status Board', icon: 'Columns' }
 ];
 
 export const ROLE_PERMISSIONS = {
@@ -119,6 +125,12 @@ export const ROLE_PERMISSIONS = {
     'assistant_xray',
     'assistant_chairside',
     'assistant_notes'
+  ],
+  lab_coordinator: [
+    'lab_cases',
+    'lab_crown',
+    'lab_implant',
+    'lab_status'
   ]
 };
 
@@ -140,5 +152,6 @@ export const ROLE_LABELS = {
   frontdesk: 'Clinic Front Desk (Reception)',
   billing_staff: 'Billing Staff Coordinator',
   dental_assistant: 'Dental Assistant',
-  assistant: 'Dental Assistant'
+  assistant: 'Dental Assistant',
+  lab_coordinator: 'Lab Coordinator'
 };
