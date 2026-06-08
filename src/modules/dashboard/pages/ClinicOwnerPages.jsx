@@ -11,7 +11,11 @@ import {
   Settings,
   TrendingUp,
   Activity,
-  UserCheck2
+  UserCheck2,
+  Download,
+  AlertCircle,
+  Filter,
+  Clock
 } from 'lucide-react';
 import {
   BarChart,
@@ -27,6 +31,7 @@ import {
   Cell
 } from 'recharts';
 import { useClinicOwnerStore } from '../../../store/clinicOwnerStore';
+import { useBillingStore } from '../../../store/billingStore';
 import { DataTable } from '../../../shared/ui/DataTable';
 import { Button } from '../../../shared/ui/Button';
 import { Input } from '../../../shared/ui/Input';
@@ -541,72 +546,317 @@ export function ClinicClinicalPage() {
   );
 }
 
-// 4. BILLING & INVOICES PAGE (CRUD)
-// 4. BILLING HUB — Tabbed Billing System (imports from BillingPages.jsx)
-import {
-  BillingDashboardTab,
-  BillingInvoicesTab,
-  BillingPaymentsTab,
-  BillingClaimsTab,
-  BillingStatementsTab
-} from './BillingPages';
-
+// 4. BILLING HUB — READ-ONLY Clinic Owner Financial Dashboard
 export function ClinicBillingPage() {
-  const BILLING_TABS = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'invoices', label: 'Invoices', icon: '🧾' },
-    { id: 'payments', label: 'Payments', icon: '💳' },
-    { id: 'claims', label: 'Claims', icon: '🛡️' },
-    { id: 'statements', label: 'Statements', icon: '📋' }
-  ];
+  const { invoices, payments } = useBillingStore();
+  const toast = useToast();
 
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
-  const renderTab = () => {
-    switch (activeTab) {
-      case 'dashboard': return <BillingDashboardTab />;
-      case 'invoices':  return <BillingInvoicesTab />;
-      case 'payments':  return <BillingPaymentsTab />;
-      case 'claims':    return <BillingClaimsTab />;
-      case 'statements': return <BillingStatementsTab />;
-      default: return null;
+  // Filter selection state
+  const [filterType, setFilterType] = useState('month'); // 'today', 'month', 'year', 'custom'
+  const [customStart, setCustomStart] = useState('');
+  const [customEnd, setCustomEnd] = useState('');
+
+  // Fixed KPIs (not affected by active filters, representing current state)
+  const todayRevenue = useMemo(() => {
+    return payments
+      .filter((p) => p.date === today)
+      .reduce((sum, p) => sum + p.amount, 0);
+  }, [payments, today]);
+
+  const monthlyRevenue = useMemo(() => {
+    const currentMonth = today.substring(0, 7); // '2026-06'
+    return payments
+      .filter((p) => p.date.startsWith(currentMonth))
+      .reduce((sum, p) => sum + p.amount, 0);
+  }, [payments, today]);
+
+  const yearlyRevenue = useMemo(() => {
+    const currentYear = today.substring(0, 4); // '2026'
+    return payments
+      .filter((p) => p.date.startsWith(currentYear))
+      .reduce((sum, p) => sum + p.amount, 0);
+  }, [payments, today]);
+
+  const pendingInvoicesCount = useMemo(() => {
+    return invoices.filter((inv) => inv.status === 'Unpaid' || inv.status === 'Partial').length;
+  }, [invoices]);
+
+  // Overdue Invoice Alerts
+  const overdueInvoices = useMemo(() => {
+    return invoices.filter((inv) => inv.status === 'Overdue');
+  }, [invoices]);
+
+  // Filtered Payments for list & trend indicator based on active filter
+  const filteredPayments = useMemo(() => {
+    let list = [...payments];
+    
+    if (filterType === 'today') {
+      list = list.filter((p) => p.date === today);
+    } else if (filterType === 'month') {
+      const currentMonth = today.substring(0, 7);
+      list = list.filter((p) => p.date.startsWith(currentMonth));
+    } else if (filterType === 'year') {
+      const currentYear = today.substring(0, 4);
+      list = list.filter((p) => p.date.startsWith(currentYear));
+    } else if (filterType === 'custom') {
+      if (customStart) {
+        list = list.filter((p) => p.date >= customStart);
+      }
+      if (customEnd) {
+        list = list.filter((p) => p.date <= customEnd);
+      }
     }
+    
+    // Sort by date descending
+    return list.sort((a, b) => new Date(b.date) - new Date(a.date));
+  }, [payments, filterType, customStart, customEnd, today]);
+
+  // Monthly Revenue Trend Chart (current year, computed dynamically)
+  const monthlyTrendData = useMemo(() => {
+    const currentYear = today.substring(0, 4);
+    const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    return monthsShort.map((m, idx) => {
+      const monthPrefix = `${currentYear}-${String(idx + 1).padStart(2, '0')}`;
+      const monthPayments = payments.filter((p) => p.date.startsWith(monthPrefix));
+      
+      const insurance = monthPayments.filter((p) => p.method === 'Insurance').reduce((sum, p) => sum + p.amount, 0);
+      const patient = monthPayments.filter((p) => p.method !== 'Insurance').reduce((sum, p) => sum + p.amount, 0);
+      const total = insurance + patient;
+      
+      return {
+        month: m,
+        revenue: total,
+        insurance,
+        patient
+      };
+    });
+  }, [payments, today]);
+
+  // CSV Exporter Helper
+  const handleDownloadCSV = (filename, data) => {
+    if (data.length === 0) {
+      toast.warning('No transactions found for this date range.');
+      return;
+    }
+    const headers = ['id', 'invoiceId', 'patientName', 'amount', 'method', 'date', 'note'];
+    const headerLabels = ['Payment ID', 'Invoice ID', 'Patient Name', 'Amount ($)', 'Method', 'Date', 'Note'];
+    
+    const escapeVal = (val) => `"${String(val ?? '').replace(/"/g, '""')}"`;
+    
+    const rows = [
+      headerLabels.map(escapeVal).join(','),
+      ...data.map((item) => headers.map((h) => escapeVal(item[h])).join(','))
+    ];
+    
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${filename}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success(`Exported ${data.length} transactions as ${filename}.csv`);
+  };
+
+  const downloadMonthly = () => {
+    const currentMonth = today.substring(0, 7);
+    const monthlyData = payments.filter((p) => p.date.startsWith(currentMonth));
+    handleDownloadCSV(`monthly_revenue_${currentMonth}`, monthlyData);
+  };
+
+  const downloadYearly = () => {
+    const currentYear = today.substring(0, 4);
+    const yearlyData = payments.filter((p) => p.date.startsWith(currentYear));
+    handleDownloadCSV(`yearly_revenue_${currentYear}`, yearlyData);
   };
 
   return (
-    <div className="space-y-5 text-left animate-fade-in">
+    <div className="space-y-6 text-left animate-fade-in">
       {/* Page Header */}
-      <div className="flex items-center gap-3 border-b border-border pb-4">
-        <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
-          <DollarSign className="h-5 w-5" />
+      <div className="border-b border-border pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
+            <DollarSign className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-xl font-black text-foreground tracking-tight">Financial & Billing Analytics</h2>
+            <p className="text-[10px] text-muted-foreground font-semibold">Read-only performance dashboard for Clinic Owners.</p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-xl font-black text-foreground tracking-tight">Billing & Financial Management</h2>
-          <p className="text-[10px] text-muted-foreground font-semibold">Invoices · Payments · Claims · Statements — all in one place.</p>
+
+        {/* Action Controls for CSV Exports */}
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={downloadMonthly} className="font-bold text-xs gap-1.5 h-9">
+            <Download className="h-4 w-4" /> Download Monthly CSV
+          </Button>
+          <Button size="sm" variant="outline" onClick={downloadYearly} className="font-bold text-xs gap-1.5 h-9">
+            <Download className="h-4 w-4" /> Download Yearly CSV
+          </Button>
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex items-center gap-1 p-1 bg-muted/50 border border-border rounded-xl w-fit overflow-x-auto">
-        {BILLING_TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-extrabold transition-all whitespace-nowrap cursor-pointer ${
-              activeTab === tab.id
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground hover:bg-background/70'
-            }`}
-          >
-            <span className="text-base leading-none">{tab.icon}</span>
-            {tab.label}
-          </button>
-        ))}
+      {/* Overdue Invoice Alerts */}
+      {overdueInvoices.length > 0 && (
+        <div className="flex items-start gap-3 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl">
+          <AlertCircle className="h-5 w-5 text-rose-500 mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="text-xs font-extrabold text-rose-500">Overdue Invoice Alert</p>
+            <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">
+              {overdueInvoices.length} invoice{overdueInvoices.length > 1 ? 's' : ''} overdue — {overdueInvoices.map((inv) => `${inv.patientName} ($${inv.amount.toFixed(2)})`).join(', ')}.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: "Today's Revenue", value: `$${todayRevenue.toFixed(2)}`, icon: DollarSign, color: 'primary', sub: 'Collected today' },
+          { label: 'Monthly Revenue', value: `$${monthlyRevenue.toFixed(2)}`, icon: TrendingUp, color: 'emerald', sub: 'This month' },
+          { label: 'Yearly Revenue', value: `$${yearlyRevenue.toFixed(2)}`, icon: Activity, color: 'indigo', sub: 'This calendar year' },
+          { label: 'Pending Invoices', value: pendingInvoicesCount, icon: Clock, color: 'amber', sub: 'Awaiting collection' }
+        ].map((kpi) => {
+          const Icon = kpi.icon;
+          const colorMap = {
+            primary: 'bg-primary/10 text-primary',
+            emerald: 'bg-emerald-500/10 text-emerald-500',
+            indigo: 'bg-indigo-500/10 text-indigo-500',
+            amber: 'bg-amber-500/10 text-amber-500'
+          };
+          return (
+            <div key={kpi.label} className="bg-card border border-border p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">{kpi.label}</span>
+                  <h3 className="text-xl sm:text-2xl font-black text-foreground mt-1">{kpi.value}</h3>
+                </div>
+                <div className={`p-2.5 rounded-xl ${colorMap[kpi.color]}`}>
+                  <Icon className="h-4.5 w-4.5" />
+                </div>
+              </div>
+              <p className="text-[9px] text-muted-foreground font-semibold mt-3">{kpi.sub}</p>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Active Tab Content */}
-      <div className="min-h-[500px]">
-        {renderTab()}
+      {/* Interactive Filters Panel */}
+      <div className="bg-card border border-border p-4 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <span className="text-xs font-extrabold text-foreground">Filter Transactions list:</span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex p-0.5 bg-muted rounded-xl border border-border">
+            {[
+              { id: 'today', label: 'Today' },
+              { id: 'month', label: 'This Month' },
+              { id: 'year', label: 'This Year' },
+              { id: 'custom', label: 'Custom Range' }
+            ].map((f) => (
+              <button
+                key={f.id}
+                onClick={() => setFilterType(f.id)}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition-all cursor-pointer ${
+                  filterType === f.id
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          {filterType === 'custom' && (
+            <div className="flex items-center gap-2 animate-fade-in">
+              <Input
+                type="date"
+                value={customStart}
+                onChange={(e) => setCustomStart(e.target.value)}
+                placeholder="Start Date"
+                className="w-32 h-8 text-xs font-semibold"
+              />
+              <span className="text-muted-foreground text-xs font-bold">to</span>
+              <Input
+                type="date"
+                value={customEnd}
+                onChange={(e) => setCustomEnd(e.target.value)}
+                placeholder="End Date"
+                className="w-32 h-8 text-xs font-semibold"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Charts + Recent Payments */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Revenue Trend Chart */}
+        <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-5 shadow-sm">
+          <h3 className="font-extrabold text-sm text-foreground mb-4">Monthly Revenue Trends ({today.substring(0, 4)})</h3>
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={monthlyTrendData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="month" tick={{ fontSize: 10, fontWeight: 700 }} />
+              <YAxis tick={{ fontSize: 9, fontWeight: 700 }} />
+              <Tooltip
+                contentStyle={{ fontSize: 11, fontWeight: 700, borderRadius: 8, border: '1px solid var(--border)', background: 'var(--card)' }}
+                formatter={(v) => [`$${v}`, '']}
+              />
+              <Legend wrapperStyle={{ fontSize: 10, fontWeight: 700 }} />
+              <Bar dataKey="insurance" name="Insurance Claims" fill="#6366f1" radius={[3, 3, 0, 0]} />
+              <Bar dataKey="patient" name="Patient Payments" fill="#10b981" radius={[3, 3, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Filtered Recent Payments List */}
+        <div className="bg-card border border-border rounded-2xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-extrabold text-sm text-foreground">Recent Transactions</h3>
+              <span className="text-[9px] font-bold text-muted-foreground bg-muted border border-border px-2 py-0.5 rounded-full uppercase tracking-wider">
+                {filterType === 'custom' ? 'Filtered' : filterType}
+              </span>
+            </div>
+
+            {filteredPayments.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-10 text-center text-muted-foreground">
+                <Clock className="h-8 w-8 stroke-1 text-muted-foreground/60 mb-2" />
+                <p className="text-xs font-bold">No payments recorded</p>
+                <p className="text-[10px] text-muted-foreground/80 mt-0.5">Adjust filters or range options.</p>
+              </div>
+            ) : (
+              <div className="space-y-2.5 max-h-[200px] overflow-y-auto pr-1">
+                {filteredPayments.slice(0, 5).map((p) => (
+                  <div key={p.id} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0 hover:bg-muted/10 px-1 rounded-lg transition-colors">
+                    <div>
+                      <p className="text-xs font-extrabold text-foreground">{p.patientName}</p>
+                      <p className="text-[9px] text-muted-foreground font-semibold">
+                        {p.method} · {p.date} Ref: {p.invoiceId}
+                      </p>
+                    </div>
+                    <span className="text-xs font-black text-emerald-500">
+                      +${p.amount.toFixed(2)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="text-[9px] text-muted-foreground font-semibold border-t border-border pt-3">
+            Showing up to 5 most recent payments for active date filter. Read-only clinic data synced with main database.
+          </div>
+        </div>
       </div>
     </div>
   );

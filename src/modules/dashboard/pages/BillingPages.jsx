@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   DollarSign,
   TrendingUp,
@@ -9,7 +10,6 @@ import {
   Edit2,
   Download,
   FileText,
-  CreditCard,
   ShieldCheck,
   Receipt,
   CheckCircle2,
@@ -24,8 +24,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
   Legend
 } from 'recharts';
 import { useBillingStore } from '../../../store/billingStore';
@@ -213,13 +211,14 @@ export function BillingInvoicesTab() {
   const { invoices, createInvoice, updateInvoice, deleteInvoice } = useBillingStore();
   const { patients } = usePatientStore();
   const toast = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(() => searchParams.get('action') === 'create-invoice');
   const [editingInv, setEditingInv] = useState(null);
 
   // Form state
-  const [patientId, setPatientId] = useState('');
-  const [date, setDate] = useState('');
+  const [patientId, setPatientId] = useState(() => patients[0]?.id || '');
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [dueDate, setDueDate] = useState('');
   const [taxPct, setTaxPct] = useState('5');
   const [discountAmt, setDiscountAmt] = useState('0');
@@ -241,6 +240,14 @@ export function BillingInvoicesTab() {
     resetForm();
     setIsOpen(true);
   };
+
+  useEffect(() => {
+    if (searchParams.get('action') === 'create-invoice') {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('action');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleOpenEdit = (inv) => {
     setEditingInv(inv);
@@ -451,22 +458,23 @@ export function BillingInvoicesTab() {
 export function BillingPaymentsTab() {
   const { payments, invoices, recordPayment, deletePayment } = useBillingStore();
   const toast = useToast();
-
-  const [isOpen, setIsOpen] = useState(false);
-  const [invoiceId, setInvoiceId] = useState('');
-  const [amount, setAmount] = useState('');
-  const [method, setMethod] = useState('Card');
-  const [payDate, setPayDate] = useState(new Date().toISOString().split('T')[0]);
-  const [note, setNote] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Filter for month-wise download
   const [filterMonth, setFilterMonth] = useState(new Date().getMonth() + 1);
   const [filterYear, setFilterYear] = useState(new Date().getFullYear());
 
+  const openPayables = useMemo(() => invoices.filter((inv) => inv.status !== 'Paid'), [invoices]);
+
+  const [isOpen, setIsOpen] = useState(() => searchParams.get('action') === 'record-payment');
+  const [invoiceId, setInvoiceId] = useState(() => openPayables[0]?.id || '');
+  const [amount, setAmount] = useState('');
+  const [method, setMethod] = useState('Card');
+  const [payDate, setPayDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [note, setNote] = useState('');
+
   const selectedInvoice = useMemo(() => invoices.find((inv) => inv.id === invoiceId), [invoices, invoiceId]);
   const balance = useMemo(() => selectedInvoice ? Math.max(0, selectedInvoice.amount - (selectedInvoice.patientPaid || 0) - (selectedInvoice.insurancePaid || 0)) : 0, [selectedInvoice]);
-
-  const openPayables = useMemo(() => invoices.filter((inv) => inv.status !== 'Paid'), [invoices]);
 
   const handleOpenRecord = () => {
     setInvoiceId(openPayables[0]?.id || '');
@@ -476,6 +484,14 @@ export function BillingPaymentsTab() {
     setNote('');
     setIsOpen(true);
   };
+
+  useEffect(() => {
+    if (searchParams.get('action') === 'record-payment') {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('action');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -887,30 +903,32 @@ export function BillingStatementsTab() {
             {patientInvoices.length === 0 ? (
               <p className="text-xs text-muted-foreground text-center py-4">No invoices found for this patient.</p>
             ) : (
-              <table className="w-full text-xs text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-border/50 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
-                    <th className="py-2.5">Invoice</th>
-                    <th className="py-2.5">Date</th>
-                    <th className="py-2.5">Services</th>
-                    <th className="py-2.5 text-right">Total</th>
-                    <th className="py-2.5 text-right">Paid</th>
-                    <th className="py-2.5 text-center">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/40">
-                  {patientInvoices.map((inv) => (
-                    <tr key={inv.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="py-2.5 font-bold text-primary">#{inv.id}</td>
-                      <td className="py-2.5 text-muted-foreground">{inv.date}</td>
-                      <td className="py-2.5 text-muted-foreground max-w-[200px] truncate">{inv.items?.map((i) => i.description).join(', ')}</td>
-                      <td className="py-2.5 font-extrabold text-right">${inv.amount.toFixed(2)}</td>
-                      <td className="py-2.5 font-extrabold text-emerald-500 text-right">${((inv.patientPaid || 0) + (inv.insurancePaid || 0)).toFixed(2)}</td>
-                      <td className="py-2.5 text-center"><InvoiceStatusBadge status={inv.status} /></td>
+              <div className="overflow-x-auto border border-border/50 rounded-xl">
+                <table className="w-full text-xs text-left border-collapse min-w-[600px]">
+                  <thead>
+                    <tr className="border-b border-border/50 text-[10px] text-muted-foreground uppercase font-bold tracking-wider bg-muted/30">
+                      <th className="py-2.5 px-3">Invoice</th>
+                      <th className="py-2.5 px-3">Date</th>
+                      <th className="py-2.5 px-3">Services</th>
+                      <th className="py-2.5 px-3 text-right">Total</th>
+                      <th className="py-2.5 px-3 text-right">Paid</th>
+                      <th className="py-2.5 px-3 text-center">Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-border/40">
+                    {patientInvoices.map((inv) => (
+                      <tr key={inv.id} className="hover:bg-muted/30 transition-colors">
+                        <td className="py-2.5 px-3 font-bold text-primary">#{inv.id}</td>
+                        <td className="py-2.5 px-3 text-muted-foreground">{inv.date}</td>
+                        <td className="py-2.5 px-3 text-muted-foreground max-w-[200px] truncate">{inv.items?.map((i) => i.description).join(', ')}</td>
+                        <td className="py-2.5 px-3 font-extrabold text-right">${inv.amount.toFixed(2)}</td>
+                        <td className="py-2.5 px-3 font-extrabold text-emerald-500 text-right">${((inv.patientPaid || 0) + (inv.insurancePaid || 0)).toFixed(2)}</td>
+                        <td className="py-2.5 px-3 text-center"><InvoiceStatusBadge status={inv.status} /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
 
@@ -918,26 +936,28 @@ export function BillingStatementsTab() {
           {patientPayments.length > 0 && (
             <div className="p-5 border-t border-border space-y-3">
               <h4 className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider">Payment History</h4>
-              <table className="w-full text-xs text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-border/50 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
-                    <th className="py-2">Ref</th>
-                    <th className="py-2">Date</th>
-                    <th className="py-2">Method</th>
-                    <th className="py-2 text-right">Amount</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/40">
-                  {patientPayments.map((p) => (
-                    <tr key={p.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="py-2 font-bold text-primary">#{p.id}</td>
-                      <td className="py-2 text-muted-foreground">{p.date}</td>
-                      <td className="py-2"><Badge variant="secondary" className="font-bold text-[9px]">{p.method}</Badge></td>
-                      <td className="py-2 font-extrabold text-emerald-500 text-right">+${p.amount.toFixed(2)}</td>
+              <div className="overflow-x-auto border border-border/50 rounded-xl">
+                <table className="w-full text-xs text-left border-collapse min-w-[400px]">
+                  <thead>
+                    <tr className="border-b border-border/50 text-[10px] text-muted-foreground uppercase font-bold tracking-wider bg-muted/30">
+                      <th className="py-2 px-3">Ref</th>
+                      <th className="py-2 px-3">Date</th>
+                      <th className="py-2 px-3">Method</th>
+                      <th className="py-2 px-3 text-right">Amount</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-border/40">
+                    {patientPayments.map((p) => (
+                      <tr key={p.id} className="hover:bg-muted/30 transition-colors">
+                        <td className="py-2 px-3 font-bold text-primary">#{p.id}</td>
+                        <td className="py-2 px-3 text-muted-foreground">{p.date}</td>
+                        <td className="py-2 px-3"><Badge variant="secondary" className="font-bold text-[9px]">{p.method}</Badge></td>
+                        <td className="py-2 px-3 font-extrabold text-emerald-500 text-right">+${p.amount.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

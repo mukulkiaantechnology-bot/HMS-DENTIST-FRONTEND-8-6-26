@@ -46,6 +46,10 @@ import {
   FrontDeskWaitlistPage
 } from '../../modules/dashboard/pages/FrontDeskPages';
 
+// Billing Staff Imports
+import { BillingLayout } from '../layout/BillingLayout';
+import { BillingPage } from '../../modules/billing/pages/BillingPage';
+
 // Simple Not Found component styled with modern aesthetics
 function NotFoundPage() {
   const user = useAuthStore((state) => state.user);
@@ -57,6 +61,8 @@ function NotFoundPage() {
     ? '/hygienist/dashboard'
     : user?.role === 'front_desk' || user?.role === 'frontdesk'
     ? '/frontdesk/dashboard'
+    : user?.role === 'billing_staff'
+    ? '/billing'
     : '/super-admin/dashboard';
 
   return (
@@ -86,6 +92,7 @@ export function AppRoutes() {
     if (user.role === 'dentist') return '/dentist/patients';
     if (user.role === 'hygienist') return '/hygienist/dashboard';
     if (user.role === 'front_desk' || user.role === 'frontdesk') return '/frontdesk/dashboard';
+    if (user.role === 'billing_staff') return '/billing';
     return '/super-admin/dashboard';
   };
 
@@ -224,6 +231,13 @@ export function AppRoutes() {
           </Route>
           <Route element={<ProtectedRoute module="frontdesk_waitlist" />}>
             <Route path="/frontdesk/waitlist" element={<FrontDeskWaitlistPage />} />
+          </Route>
+        </Route>
+
+        {/* Billing Staff Protected Routes Layout shell */}
+        <Route element={<BillingLayout />}>
+          <Route element={<ProtectedRoute module="billing_hub" />}>
+            <Route path="/billing" element={<BillingPage />} />
           </Route>
         </Route>
       </Routes>

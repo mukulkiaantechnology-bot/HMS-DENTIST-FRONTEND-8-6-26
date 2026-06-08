@@ -8,7 +8,10 @@ import {
   UserCheck,
   Edit2,
   Trash2,
-  Receipt
+  Receipt,
+  Download,
+  TrendingUp,
+  AlertCircle
 } from 'lucide-react';
 import {
   BarChart,
@@ -412,9 +415,26 @@ export function SuperAdminSubscriptionsPage() {
 }
 
 // 3. BILLING PAGE (SaaS Invoices CRUD)
+// CSV download utility (scoped)
+function downloadSaasCSV(filename, rows, headers) {
+  const escape = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const lines = [headers.map(escape).join(','), ...rows.map((r) => headers.map((h) => escape(r[h] ?? '')).join(','))];
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export function SuperAdminBillingPage() {
   const { saasInvoices, clinics, users, addSaasInvoice, updateSaasInvoice, deleteSaasInvoice } = useSuperAdminStore();
   const toast = useToast();
+
+  // Month-wise filter
+  const [filterMonth, setFilterMonth] = useState(new Date().getMonth() + 1);
+  const [filterYear, setFilterYear] = useState(new Date().getFullYear());
 
   // Dialog / Modal state
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -426,6 +446,36 @@ export function SuperAdminBillingPage() {
   const [amount, setAmount] = useState('299.00');
   const [issueDate, setIssueDate] = useState('');
   const [status, setStatus] = useState('Unpaid');
+
+  // ── ANALYTICS COMPUTATIONS ──────────────────────────────────────────────
+  const mrr = useMemo(() =>
+    saasInvoices.filter((i) => i.status === 'Paid').reduce((s, i) => s + Number(i.amount), 0),
+    [saasInvoices]
+  );
+  const activeClinicsCount = useMemo(() => clinics.filter((c) => c.status === 'Active').length, [clinics]);
+  const trialClinicsCount = useMemo(() => clinics.filter((c) => c.status === 'Trial' || c.status === 'Trialing').length, [clinics]);
+  const overdueClinicsCount = useMemo(() => saasInvoices.filter((i) => i.status === 'Overdue').length, [saasInvoices]);
+
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  const filteredInvoices = useMemo(() => {
+    const prefix = `${filterYear}-${String(filterMonth).padStart(2, '0')}`;
+    return saasInvoices.filter((i) => i.issueDate?.startsWith(prefix));
+  }, [saasInvoices, filterMonth, filterYear]);
+
+  const handleDownloadMonthly = () => {
+    const rows = filteredInvoices.map((i) => ({
+      'Invoice ID': i.id,
+      'Clinic': i.clinicName || clinics.find((c) => c.id === i.clinicId)?.name || '',
+      'Plan': i.plan || 'Standard',
+      'Amount': Number(i.amount).toFixed(2),
+      'Issue Date': i.issueDate,
+      'Status': i.status
+    }));
+    if (rows.length === 0) { toast.warning('No invoices found for this month.'); return; }
+    downloadSaasCSV(`saas_billing_${filterYear}_${String(filterMonth).padStart(2,'0')}.csv`, rows, Object.keys(rows[0]));
+    toast.success(`Exported ${rows.length} invoices for ${MONTHS[filterMonth - 1]} ${filterYear}.`);
+  };
 
   const handleOpenAdd = () => {
     setClinicId(clinics[0]?.id || 'clinic-1');
@@ -519,17 +569,60 @@ export function SuperAdminBillingPage() {
 
   return (
     <div className="space-y-6 text-left">
+      {/* ── Page Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
-        <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <DollarSign className="h-6 w-6 text-primary" />
-            Billing & Invoices
-          </h2>
-          <p className="text-xs text-muted-foreground font-semibold">Track historical recurring payments and generate new invoices.</p>
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
+            <DollarSign className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-xl font-black text-foreground tracking-tight">SaaS Billing & Revenue</h2>
+            <p className="text-[10px] text-muted-foreground font-semibold">Subscription invoices, MRR tracking, and month-wise reports.</p>
+          </div>
         </div>
-        <Button onClick={handleOpenAdd} className="gap-1.5 w-full sm:w-auto justify-center">
+        <Button onClick={handleOpenAdd} className="gap-1.5 font-bold text-xs h-9 w-full sm:w-auto justify-center">
           <Plus className="h-4 w-4" />
           Create Invoice
+        </Button>
+      </div>
+
+      {/* ── MRR Summary Cards ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: 'Monthly Recurring Revenue', value: `$${mrr.toFixed(2)}`, icon: TrendingUp, color: 'text-primary bg-primary/10' },
+          { label: 'Active Clinics', value: activeClinicsCount, icon: Building2, color: 'text-emerald-500 bg-emerald-500/10' },
+          { label: 'Trial Clinics', value: trialClinicsCount, icon: Briefcase, color: 'text-amber-500 bg-amber-500/10' },
+          { label: 'Overdue Invoices', value: overdueClinicsCount, icon: AlertCircle, color: 'text-rose-500 bg-rose-500/10' }
+        ].map((kpi) => {
+          const Icon = kpi.icon;
+          return (
+            <div key={kpi.label} className="bg-card border border-border p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider block">{kpi.label}</span>
+                  <h3 className="text-xl sm:text-2xl font-black text-foreground mt-1">{kpi.value}</h3>
+                </div>
+                <div className={`p-2.5 rounded-xl ${kpi.color}`}>
+                  <Icon className="h-4.5 w-4.5" />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── Month-wise Filter & Download ── */}
+      <div className="flex flex-wrap gap-3 items-center p-4 bg-card border border-border rounded-2xl shadow-sm">
+        <span className="text-xs font-extrabold text-muted-foreground">Monthly Report:</span>
+        <select value={filterMonth} onChange={(e) => setFilterMonth(Number(e.target.value))} className="text-xs font-bold bg-muted border border-border rounded-lg p-2 focus:outline-none text-foreground">
+          {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
+        </select>
+        <input type="number" value={filterYear} onChange={(e) => setFilterYear(Number(e.target.value))} className="w-20 text-xs font-bold bg-muted border border-border rounded-lg p-2 focus:outline-none text-foreground" />
+        <span className="text-[10px] text-muted-foreground font-semibold">
+          {filteredInvoices.length} invoice{filteredInvoices.length !== 1 ? 's' : ''} found for {MONTHS[filterMonth - 1]} {filterYear}
+        </span>
+        <Button size="sm" variant="outline" onClick={handleDownloadMonthly} className="font-bold text-xs gap-1.5 h-9 ml-auto">
+          <Download className="h-4 w-4" /> Download CSV
         </Button>
       </div>
 
