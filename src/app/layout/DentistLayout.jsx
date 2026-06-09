@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { Sun, Moon, LogOut, Users, AlertTriangle, Menu, Stethoscope } from 'lucide-react';
+import { Sun, Moon, LogOut, Menu, Stethoscope } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useDentistStore } from '../../store/dentistStore';
 import { DentistSidebar } from './DentistSidebar';
@@ -83,48 +83,7 @@ export function DentistLayout({ children }) {
               <Stethoscope className="h-4.5 w-4.5" />
             </div>
 
-            {/* Active Patient switcher context */}
-            <div className="flex items-center gap-1.5 md:gap-2 bg-muted/60 border border-border px-2 md:px-3 py-1 rounded-xl max-w-[160px] sm:max-w-none">
-              <Users className="h-3.5 w-3.5 text-primary flex-shrink-0" />
-              <select
-                value={activePatientId || ''}
-                onChange={handlePatientChange}
-                className="bg-transparent border-none text-[10px] md:text-xs font-bold focus:outline-none cursor-pointer max-w-[110px] sm:max-w-[180px] text-foreground py-0.5"
-              >
-                <option value="" disabled className="bg-card">-- Patient --</option>
-                {patients.map((p) => (
-                  <option key={p.id} value={p.id} className="bg-card">
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Quick vitals & allergy preview in header */}
-            {activePatient ? (
-              <div className="hidden lg:flex items-center gap-3 text-left text-[11px] leading-none border-l border-border pl-4 flex-shrink-0">
-                <div>
-                  <span className="text-muted-foreground font-semibold">Allergies:</span>
-                  <span className={`ml-1 px-2 py-0.5 rounded-full font-extrabold ${
-                    activePatient.allergies === 'None'
-                      ? 'bg-emerald-500/10 text-emerald-500'
-                      : 'bg-rose-500/10 text-rose-500 animate-pulse'
-                  }`}>
-                    {activePatient.allergies}
-                  </span>
-                </div>
-                <div className="h-4 w-px bg-border/60" />
-                <div>
-                  <span className="text-muted-foreground font-semibold">Vitals:</span>
-                  <span className="ml-1 font-bold text-foreground">{activePatient.vitals}</span>
-                </div>
-              </div>
-            ) : (
-              <div className="hidden lg:flex items-center gap-1 text-[11px] text-rose-500 font-bold flex-shrink-0">
-                <AlertTriangle className="h-3.5 w-3.5" />
-                Select a patient to begin clinical documentation
-              </div>
-            )}
+            {/* Context switchers removed from header */}
           </div>
 
           {/* Right hand controls */}

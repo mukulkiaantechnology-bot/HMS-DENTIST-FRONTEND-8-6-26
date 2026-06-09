@@ -31,12 +31,7 @@ export function DentistSidebar({ isMobileOpen, onClose }) {
   const menuItems = [
     { key: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
     { key: 'appointments', label: 'Appointments', icon: 'Calendar' },
-    { key: 'patients', label: 'Patients Registry', icon: 'Users' },
-    { key: 'chart', label: 'Clinical Charting', icon: 'Activity' },
-    { key: 'treatment', label: 'Treatment Plans', icon: 'ClipboardList' },
-    { key: 'xrays', label: 'X-Rays Review', icon: 'Image' },
-    { key: 'prescription', label: 'Prescriptions', icon: 'Pill' },
-    { key: 'notes', label: 'Clinical Notes', icon: 'FileText' }
+    { key: 'patients', label: 'Patients Registry', icon: 'Users' }
   ];
 
   const handleContextClick = (item, e) => {
@@ -116,12 +111,7 @@ export function DentistSidebar({ isMobileOpen, onClose }) {
             <div className="text-xs font-extrabold text-foreground truncate">
               {user.name}
             </div>
-            {activePatient && (
-              <div className="mt-2 pt-2 border-t border-border/40 text-[10px] text-muted-foreground flex items-center gap-1.5">
-                <Icons.User className="h-3 w-3 text-indigo-400" />
-                <span className="truncate">Chart: <strong className="text-foreground">{activePatient.name}</strong></span>
-              </div>
-            )}
+
           </div>
         ) : (
           <div className="my-4 flex justify-center" title="Clinical Workspace active">

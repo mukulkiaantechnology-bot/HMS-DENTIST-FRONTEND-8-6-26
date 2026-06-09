@@ -118,7 +118,6 @@ export function HygienistPatientDetailPage() {
     { key: 'overview', label: 'Overview', icon: Users },
     { key: 'perio', label: 'Perio Charting', icon: Activity },
     { key: 'risk', label: 'Risk Analysis', icon: Sliders },
-    { key: 'recall', label: 'Recall System', icon: Clock },
     { key: 'notes', label: 'Clinical Notes', icon: FileText }
   ];
 
@@ -156,18 +155,18 @@ export function HygienistPatientDetailPage() {
       </div>
 
       {/* Tabs navigation */}
-      <div className="flex border-b border-border/80 overflow-x-auto no-scrollbar gap-2">
+      <div className="flex border-b border-border/80 overflow-x-auto no-scrollbar gap-2 mt-4">
         {tabs.map((t) => {
           const IconComp = t.icon;
-          const isActive = activeTab === t.key;
+          const isSelected = activeTab === t.key;
           return (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`flex items-center gap-2 px-4 py-3 text-xs font-extrabold transition-all border-b-2 outline-none whitespace-nowrap cursor-pointer ${
-                isActive
-                  ? 'border-primary text-primary bg-primary/5 rounded-t-lg font-black'
-                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+              className={`flex items-center gap-2 px-4 py-3 text-xs font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap ${
+                isSelected
+                  ? 'border-primary text-primary font-black'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               <IconComp className="h-4 w-4" />
@@ -178,11 +177,10 @@ export function HygienistPatientDetailPage() {
       </div>
 
       {/* Tab Contents */}
-      <div className="flex-1 bg-card border border-border p-6 rounded-3xl shadow-sm min-h-[450px] min-w-0 w-full overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 bg-background mt-4">
         {activeTab === 'overview' && <PatientOverviewTab patient={patient} risk={risk} />}
         {activeTab === 'perio' && <PerioChartingTab key={patient.id} patient={patient} />}
         {activeTab === 'risk' && <RiskAnalysisTab key={patient.id} patient={patient} />}
-        {activeTab === 'recall' && <RecallSystemTab key={patient.id} patient={patient} />}
         {activeTab === 'notes' && <ClinicalNotesTab key={patient.id} patient={patient} />}
       </div>
     </div>
@@ -194,7 +192,7 @@ export function HygienistPatientDetailPage() {
 // ----------------------------------------------------
 function PatientOverviewTab({ patient, risk }) {
   return (
-    <div className="space-y-6 text-left">
+    <div className="space-y-6 text-left bg-card border border-border p-6 rounded-3xl shadow-sm">
       <div className="border-b border-border/60 pb-3">
         <h3 className="text-lg font-extrabold text-foreground">Demographics & Clinical Summary</h3>
         <p className="text-[11px] text-muted-foreground font-semibold">General medical history summary and vitals logged by front desk.</p>
@@ -363,7 +361,7 @@ function PerioChartingTab({ patient }) {
   };
 
   return (
-    <div className="space-y-6 text-left">
+    <div className="space-y-6 text-left bg-card border border-border p-6 rounded-3xl shadow-sm">
       <div className="border-b border-border/60 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <h3 className="text-lg font-extrabold text-foreground">Interactive Periodontal Chart</h3>
@@ -459,7 +457,7 @@ function RiskAnalysisTab({ patient }) {
   };
 
   return (
-    <div className="space-y-6 text-left">
+    <div className="space-y-6 text-left bg-card border border-border p-6 rounded-3xl shadow-sm">
       <div className="border-b border-border/60 pb-3">
         <h3 className="text-lg font-extrabold text-foreground">Gum Disease Risk Engine</h3>
         <p className="text-[11px] text-muted-foreground font-semibold">Classify periodontal tissue health and trigger AI custom patient care recommendations.</p>
@@ -581,134 +579,6 @@ function RiskAnalysisTab({ patient }) {
 }
 
 // ----------------------------------------------------
-// 2D. TAB: RECALL SYSTEM
-// ----------------------------------------------------
-function RecallSystemTab({ patient }) {
-  const { recalls, triggerRecallReminder, autoScheduleRecall } = useHygienistStore();
-  const toast = useToast();
-
-  const recall = recalls.find((r) => r.patientId === patient.id);
-
-  if (!recall) {
-    return (
-      <div className="p-6 text-center space-y-2">
-        <Clock className="h-8 w-8 text-muted-foreground mx-auto" />
-        <h4 className="font-bold text-xs">No Recall Data Found</h4>
-        <p className="text-[11px] text-muted-foreground">This patient is not enrolled in the automated recall program.</p>
-      </div>
-    );
-  }
-
-  const handleSendReminder = () => {
-    triggerRecallReminder(recall.id);
-    toast.success(`Automated recall reminder notification dispatched to ${patient.name}!`, 'Notification Dispatched');
-  };
-
-  const handleAutoSchedule = () => {
-    // Auto calculate 6 months from today
-    const date = new Date();
-    date.setMonth(date.getMonth() + 6);
-    const dateStr = date.toISOString().split('T')[0];
-    autoScheduleRecall(recall.id, dateStr);
-    toast.success(`Scheduled cleaning booked for ${dateStr}!`, 'Recall Booked');
-  };
-
-  const statusVariant = recall.status === 'Scheduled'
-    ? 'success'
-    : recall.status === 'Reminded'
-    ? 'warning'
-    : 'destructive';
-
-  return (
-    <div className="space-y-6 text-left">
-      <div className="border-b border-border/60 pb-3">
-        <h3 className="text-lg font-extrabold text-foreground">Recall Campaign Operations</h3>
-        <p className="text-[11px] text-muted-foreground font-semibold">Track hygiene compliance, check-up scheduling, and dispatch reminder campaigns.</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
-        {/* Campaign Metrics */}
-        <div className="p-4 bg-muted/40 border border-border rounded-2xl space-y-3">
-          <h4 className="font-bold text-foreground uppercase text-[10px] tracking-wider text-primary">Recall Metrics</h4>
-          <div className="space-y-2">
-            <div className="flex justify-between border-b border-border/40 pb-1.5"><span className="text-muted-foreground font-semibold">Program Frequency:</span> <strong className="text-foreground">{recall.frequency}</strong></div>
-            <div className="flex justify-between border-b border-border/40 pb-1.5"><span className="text-muted-foreground font-semibold">Last Prophy Hygiene:</span> <strong className="text-foreground">{recall.lastVisit}</strong></div>
-            <div className="flex justify-between border-b border-border/40 pb-1.5"><span className="text-muted-foreground font-semibold">Target Recall Date:</span> <strong className="text-foreground">{recall.dueBy}</strong></div>
-            <div className="flex justify-between items-center pt-0.5"><span className="text-muted-foreground font-semibold">Campaign Status:</span> <Badge variant={statusVariant} className="font-bold text-[9px]">{recall.status}</Badge></div>
-          </div>
-        </div>
-
-        {/* Campaign Triggers */}
-        <div className="p-4 bg-muted/40 border border-border rounded-2xl space-y-3 flex flex-col justify-between">
-          <div>
-            <h4 className="font-bold text-foreground uppercase text-[10px] tracking-wider text-primary mb-1">Campaign Triggers</h4>
-            <p className="text-[10px] text-muted-foreground font-semibold leading-relaxed">
-              Auto-generate SMS or Email reminders to alert patient about check-up availability.
-            </p>
-          </div>
-          <div className="space-y-2">
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={recall.status === 'Scheduled'}
-              onClick={handleSendReminder}
-              className="w-full text-xs font-bold gap-1.5 h-10 cursor-pointer"
-            >
-              <Send className="h-3.5 w-3.5" />
-              Send Reminder SMS/Email
-            </Button>
-            <Button
-              size="sm"
-              disabled={recall.status === 'Scheduled'}
-              onClick={handleAutoSchedule}
-              className="w-full text-xs font-bold gap-1.5 h-10 cursor-pointer"
-            >
-              <Calendar className="h-3.5 w-3.5" />
-              Auto-Schedule Cleaning
-            </Button>
-          </div>
-        </div>
-
-        {/* Workflow Timeline */}
-        <div className="p-4 bg-muted/40 border border-border rounded-2xl space-y-3">
-          <h4 className="font-bold text-foreground uppercase text-[10px] tracking-wider text-primary">Campaign History Log</h4>
-          
-          <div className="relative border-l border-border pl-4 space-y-3">
-            <div className="relative">
-              <div className="absolute -left-[21px] top-1 bg-primary text-white p-0.5 rounded-full">
-                <Check className="h-2 w-2" />
-              </div>
-              <p className="text-[10px] font-bold text-foreground">Completed Hygiene Visit</p>
-              <p className="text-[9px] text-muted-foreground font-semibold">Calculus removal and scaling done on {recall.lastVisit}.</p>
-            </div>
-            
-            {recall.status !== 'Due' && (
-              <div className="relative">
-                <div className="absolute -left-[21px] top-1 bg-amber-500 text-white p-0.5 rounded-full">
-                  <Send className="h-2 w-2" />
-                </div>
-                <p className="text-[10px] font-bold text-foreground">Reminder Dispatch</p>
-                <p className="text-[9px] text-muted-foreground font-semibold">Automated check-up text notification dispatched.</p>
-              </div>
-            )}
-
-            {recall.status === 'Scheduled' && (
-              <div className="relative">
-                <div className="absolute -left-[21px] top-1 bg-emerald-500 text-white p-0.5 rounded-full">
-                  <Calendar className="h-2 w-2" />
-                </div>
-                <p className="text-[10px] font-bold text-foreground">Check-up Booked</p>
-                <p className="text-[9px] text-muted-foreground font-semibold">Scheduled for follow-up cleaning on {recall.dueBy}.</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ----------------------------------------------------
 // 2E. TAB: CLINICAL NOTES
 // ----------------------------------------------------
 function ClinicalNotesTab({ patient }) {
@@ -784,7 +654,7 @@ function ClinicalNotesTab({ patient }) {
   };
 
   return (
-    <div className="space-y-6 text-left">
+    <div className="space-y-6 text-left bg-card border border-border p-6 rounded-3xl shadow-sm">
       <div className="border-b border-border/60 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <h3 className="text-lg font-extrabold text-foreground">Clinical Hygiene EHR Notes</h3>

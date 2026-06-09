@@ -31,9 +31,7 @@ export function HygienistSidebar({ isMobileOpen, onClose }) {
   const menuItems = [
     { key: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
     { key: 'patients', label: 'Patients', icon: 'Users' },
-    { key: 'perio', label: 'Perio Charting', icon: 'Activity' },
-    { key: 'recall_list', label: 'Recall List', icon: 'Clock' },
-    { key: 'notes', label: 'Clinical Notes', icon: 'FileText' }
+    { key: 'recall_list', label: 'Recall List', icon: 'Clock' }
   ];
 
   const handleContextClick = (item, e) => {
@@ -113,12 +111,7 @@ export function HygienistSidebar({ isMobileOpen, onClose }) {
             <div className="text-xs font-extrabold text-foreground truncate">
               {user.name}
             </div>
-            {activePatient && (
-              <div className="mt-2 pt-2 border-t border-border/40 text-[10px] text-muted-foreground flex items-center gap-1.5">
-                <Icons.User className="h-3 w-3 text-indigo-400" />
-                <span className="truncate">Chart: <strong className="text-foreground">{activePatient.name}</strong></span>
-              </div>
-            )}
+
           </div>
         ) : (
           <div className="my-4 flex justify-center" title="Preventive Workspace active">
