@@ -13,7 +13,7 @@ import {
   UserPlus
 } from 'lucide-react';
 import { useAppointmentStore } from '../../../store/appointmentStore';
-import { usePatientStore } from '../../../store/patientStore';
+import { useClinicOwnerStore } from '../../../store/clinicOwnerStore';
 import { useFrontDeskStore } from '../../../store/frontDeskStore';
 import { useClinicStore } from '../../../store/clinicStore';
 import { Button } from '../../../shared/ui/Button';
@@ -33,7 +33,7 @@ const getTodayDateStr = () => new Date().toISOString().split('T')[0];
 // ----------------------------------------------------
 export function FrontDeskAppointmentsPage() {
   const { appointments, addAppointment, deleteAppointment } = useAppointmentStore();
-  const { patients } = usePatientStore();
+  const { patients } = useClinicOwnerStore();
   const toast = useToast();
 
   const [selectedDentist, setSelectedDentist] = useState('Dr. Michael Chen, DDS');
@@ -299,7 +299,7 @@ export function FrontDeskAppointmentsPage() {
 // 2. PATIENT REGISTRATION PAGE
 // ----------------------------------------------------
 export function FrontDeskRegistrationPage() {
-  const { patients, addPatient, updatePatient, deletePatient } = usePatientStore();
+  const { patients, addPatient, updatePatient, deletePatient } = useClinicOwnerStore();
   const selectedClinicId = useClinicStore((state) => state.selectedClinicId);
   const toast = useToast();
   const location = useLocation();
@@ -658,9 +658,8 @@ export function FrontDeskRegistrationPage() {
 // ----------------------------------------------------
 export function FrontDeskInsurancePage() {
   const { insuranceChecks, addInsuranceCheck, evaluateEligibility } = useFrontDeskStore();
-  const { patients } = usePatientStore();
+  const { patients } = useClinicOwnerStore();
   const toast = useToast();
-
   const [verifyPatientId, setVerifyPatientId] = useState(patients[0]?.id || '');
   const [provider, setProvider] = useState('');
   const [policyNum, setPolicyNum] = useState('');

@@ -64,6 +64,15 @@ import { CrownTrackingPage } from '../../modules/lab/pages/CrownTrackingPage';
 import { ImplantCasesPage } from '../../modules/lab/pages/ImplantCasesPage';
 import { StatusBoardPage } from '../../modules/lab/pages/StatusBoardPage';
 
+// Patient Portal Imports
+import { PatientLayout } from '../layout/PatientLayout';
+import { PatientDashboard } from '../../modules/patient/pages/PatientDashboard';
+import { PatientAppointments } from '../../modules/patient/pages/PatientAppointments';
+import { PatientTreatmentPlan } from '../../modules/patient/pages/PatientTreatmentPlan';
+import { PatientBilling } from '../../modules/patient/pages/PatientBilling';
+import { PatientPrescriptions } from '../../modules/patient/pages/PatientPrescriptions';
+import { PatientReports } from '../../modules/patient/pages/PatientReports';
+
 // Simple Not Found component styled with modern aesthetics
 function NotFoundPage() {
   const user = useAuthStore((state) => state.user);
@@ -81,6 +90,8 @@ function NotFoundPage() {
     ? '/assistant/patients'
     : user?.role === 'lab_coordinator'
     ? '/lab/cases'
+    : user?.role === 'patient'
+    ? '/patient/dashboard'
     : '/super-admin/dashboard';
 
   return (
@@ -113,6 +124,7 @@ export function AppRoutes() {
     if (user.role === 'billing_staff') return '/billing';
     if (user.role === 'dental_assistant' || user.role === 'assistant') return '/assistant/patients';
     if (user.role === 'lab_coordinator') return '/lab/cases';
+    if (user.role === 'patient') return '/patient/dashboard';
     return '/super-admin/dashboard';
   };
 
@@ -292,6 +304,29 @@ export function AppRoutes() {
           </Route>
           <Route element={<ProtectedRoute module="lab_status" />}>
             <Route path="/lab/status" element={<StatusBoardPage />} />
+          </Route>
+        </Route>
+
+        {/* Patient Portal Protected Routes Layout shell */}
+        <Route element={<PatientLayout />}>
+          <Route element={<ProtectedRoute module="patient_dashboard" />}>
+            <Route path="/patient" element={<Navigate to="/patient/dashboard" replace />} />
+            <Route path="/patient/dashboard" element={<PatientDashboard />} />
+          </Route>
+          <Route element={<ProtectedRoute module="patient_appointments" />}>
+            <Route path="/patient/appointments" element={<PatientAppointments />} />
+          </Route>
+          <Route element={<ProtectedRoute module="patient_treatment" />}>
+            <Route path="/patient/treatment" element={<PatientTreatmentPlan />} />
+          </Route>
+          <Route element={<ProtectedRoute module="patient_billing" />}>
+            <Route path="/patient/billing" element={<PatientBilling />} />
+          </Route>
+          <Route element={<ProtectedRoute module="patient_prescriptions" />}>
+            <Route path="/patient/prescriptions" element={<PatientPrescriptions />} />
+          </Route>
+          <Route element={<ProtectedRoute module="patient_reports" />}>
+            <Route path="/patient/reports" element={<PatientReports />} />
           </Route>
         </Route>
       </Routes>

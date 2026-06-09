@@ -64,7 +64,8 @@ const INITIAL_USERS = [
   { id: 'usr-6', name: 'Dr. Jane Miller', role: 'clinic_owner', email: 'jane.miller@millerdental.com', clinicId: 'clinic-4', status: 'Pending Approval', password: '123' },
   { id: 'usr-7', name: 'Samantha Billing', role: 'billing_staff', email: 'billing@vancedental.com', clinicId: 'clinic-1', status: 'Approved', password: 'password123' },
   { id: 'usr-8', name: 'David Miller', role: 'dental_assistant', email: 'assistant@vancedental.com', clinicId: 'clinic-1', status: 'Approved', password: 'password123' },
-  { id: 'usr-9', name: 'Marcus Vance', role: 'lab_coordinator', email: 'lab@vancedental.com', clinicId: 'clinic-1', status: 'Approved', password: 'password123' }
+  { id: 'usr-9', name: 'Marcus Vance', role: 'lab_coordinator', email: 'lab@vancedental.com', clinicId: 'clinic-1', status: 'Approved', password: 'password123' },
+  { id: 'usr-10', name: 'James Carter', role: 'patient', email: 'james@gmail.com', clinicId: 'clinic-1', status: 'Approved', password: 'password123' }
 ];
 
 const INITIAL_PLANS = [

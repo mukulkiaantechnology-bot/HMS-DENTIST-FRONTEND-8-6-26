@@ -74,6 +74,32 @@ const INITIAL_APPOINTMENTS = [
     status: 'Scheduled',
     type: 'Cleaning',
     notes: 'Perio maintenance visit'
+  },
+  {
+    id: 'apt-6',
+    patientId: 'pat-1',
+    patientName: 'James Carter',
+    dentistName: 'Dr. Michael Chen, DDS',
+    clinicId: 'clinic-1',
+    date: getTodayDateString(2),
+    time: '10:00',
+    duration: 45,
+    status: 'Scheduled',
+    type: 'Teeth Cleaning',
+    notes: 'Routine hygiene checkup'
+  },
+  {
+    id: 'apt-7',
+    patientId: 'pat-2',
+    patientName: 'Mary Watson',
+    dentistName: 'Dr. Michael Chen, DDS',
+    clinicId: 'clinic-1',
+    date: getTodayDateString(3),
+    time: '14:30',
+    duration: 60,
+    status: 'Scheduled',
+    type: 'Crown Prep',
+    notes: 'Preparations for tooth #19 restoration'
   }
 ];
 

@@ -27,7 +27,7 @@ import {
   Legend
 } from 'recharts';
 import { useBillingStore } from '../../../store/billingStore';
-import { usePatientStore } from '../../../store/patientStore';
+import { useClinicOwnerStore } from '../../../store/clinicOwnerStore';
 import { DataTable } from '../../../shared/ui/DataTable';
 import { Button } from '../../../shared/ui/Button';
 import { Input } from '../../../shared/ui/Input';
@@ -209,7 +209,7 @@ export function BillingDashboardTab() {
 // ═══════════════════════════════════════════════════════════════════════════════
 export function BillingInvoicesTab() {
   const { invoices, createInvoice, updateInvoice, deleteInvoice } = useBillingStore();
-  const { patients } = usePatientStore();
+  const { patients } = useClinicOwnerStore();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -776,7 +776,7 @@ export function BillingClaimsTab() {
 // ═══════════════════════════════════════════════════════════════════════════════
 export function BillingStatementsTab() {
   const { invoices, payments, statements, generateStatement, deleteStatement } = useBillingStore();
-  const { patients } = usePatientStore();
+  const { patients } = useClinicOwnerStore();
   const toast = useToast();
 
   const [selectedPatientId, setSelectedPatientId] = useState(patients[0]?.id || '');

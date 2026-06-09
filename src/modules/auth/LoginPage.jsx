@@ -43,6 +43,9 @@ export function LoginPage() {
     } else if (val === 'lab_coordinator') {
       setEmail('lab@vancedental.com');
       setPassword('password123');
+    } else if (val === 'patient') {
+      setEmail('james@gmail.com');
+      setPassword('password123');
     }
   };
 
@@ -79,6 +82,9 @@ export function LoginPage() {
       } else if (result.role === 'lab_coordinator') {
         toast.success('Successfully signed in as Lab Coordinator', 'Lab Workspace Enabled');
         navigate('/lab/cases');
+      } else if (result.role === 'patient') {
+        toast.success('Successfully signed in to Patient Portal', 'Patient Dashboard Enabled');
+        navigate('/patient/dashboard');
       } else {
         toast.warning(`Role "${result.role}" is currently running in simulated environment.`);
       }
@@ -96,7 +102,8 @@ export function LoginPage() {
     { value: 'front_desk', label: 'Front Desk - Amara Lopez (amara.reception@vancedental.com)' },
     { value: 'billing_staff', label: 'Billing Staff - Samantha Billing (billing@vancedental.com)' },
     { value: 'dental_assistant', label: 'Dental Assistant - David Miller (assistant@vancedental.com)' },
-    { value: 'lab_coordinator', label: 'Lab Coordinator - Marcus Vance (lab@vancedental.com)' }
+    { value: 'lab_coordinator', label: 'Lab Coordinator - Marcus Vance (lab@vancedental.com)' },
+    { value: 'patient', label: 'Patient - James Carter (james@gmail.com)' }
   ];
 
   return (

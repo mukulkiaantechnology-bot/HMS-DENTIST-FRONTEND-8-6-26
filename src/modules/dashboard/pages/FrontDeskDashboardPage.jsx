@@ -11,7 +11,7 @@ import {
   Activity
 } from 'lucide-react';
 import { useAppointmentStore } from '../../../store/appointmentStore';
-import { usePatientStore } from '../../../store/patientStore';
+import { useDentistStore } from '../../../store/dentistStore';
 import { useFrontDeskStore } from '../../../store/frontDeskStore';
 import { Badge } from '../../../shared/ui/Badge';
 import { Button } from '../../../shared/ui/Button';
@@ -23,7 +23,7 @@ export function FrontDeskDashboardPage() {
   const toast = useToast();
 
   const { appointments, updateAppointment } = useAppointmentStore();
-  const { patients } = usePatientStore();
+  const { patients } = useDentistStore();
   const { waitlist, insuranceChecks, walkins, addWalkIn, updateWalkInStatus } = useFrontDeskStore();
 
   // Walk-in form state

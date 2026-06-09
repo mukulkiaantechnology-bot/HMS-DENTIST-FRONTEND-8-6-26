@@ -56,7 +56,15 @@ export const MODULE_ROUTES = [
   { module: 'lab_cases', path: '/lab/cases', label: 'Lab Cases', icon: 'Folder' },
   { module: 'lab_crown', path: '/lab/crown', label: 'Crown Tracking', icon: 'Layers' },
   { module: 'lab_implant', path: '/lab/implant', label: 'Implant Cases', icon: 'Wrench' },
-  { module: 'lab_status', path: '/lab/status', label: 'Status Board', icon: 'Columns' }
+  { module: 'lab_status', path: '/lab/status', label: 'Status Board', icon: 'Columns' },
+
+  // Patient Portal Modules
+  { module: 'patient_dashboard', path: '/patient/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
+  { module: 'patient_appointments', path: '/patient/appointments', label: 'Appointments', icon: 'Calendar' },
+  { module: 'patient_treatment', path: '/patient/treatment', label: 'Treatment Plan', icon: 'Activity' },
+  { module: 'patient_billing', path: '/patient/billing', label: 'Billing & Payments', icon: 'CreditCard' },
+  { module: 'patient_prescriptions', path: '/patient/prescriptions', label: 'Prescriptions', icon: 'FileText' },
+  { module: 'patient_reports', path: '/patient/reports', label: 'Reports & X-Rays', icon: 'Folder' }
 ];
 
 export const ROLE_PERMISSIONS = {
@@ -131,6 +139,14 @@ export const ROLE_PERMISSIONS = {
     'lab_crown',
     'lab_implant',
     'lab_status'
+  ],
+  patient: [
+    'patient_dashboard',
+    'patient_appointments',
+    'patient_treatment',
+    'patient_billing',
+    'patient_prescriptions',
+    'patient_reports'
   ]
 };
 
@@ -153,5 +169,6 @@ export const ROLE_LABELS = {
   billing_staff: 'Billing Staff Coordinator',
   dental_assistant: 'Dental Assistant',
   assistant: 'Dental Assistant',
-  lab_coordinator: 'Lab Coordinator'
+  lab_coordinator: 'Lab Coordinator',
+  patient: 'Patient Portal'
 };
