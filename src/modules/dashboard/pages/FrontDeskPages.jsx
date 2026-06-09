@@ -28,6 +28,14 @@ import { DataTable } from '../../../shared/ui/DataTable';
 // ----------------------------------------------------
 const getTodayDateStr = () => new Date().toISOString().split('T')[0];
 
+const formatTimeSlot = (timeStr) => {
+  const [hourStr, minStr] = timeStr.split(':');
+  const hour = parseInt(hourStr, 10);
+  const suffix = hour >= 12 ? 'PM' : 'AM';
+  const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+  return `${displayHour.toString().padStart(2, '0')}:${minStr} ${suffix}`;
+};
+
 // ----------------------------------------------------
 // 1. APPOINTMENTS SCHEDULER PAGE
 // ----------------------------------------------------
@@ -36,18 +44,19 @@ export function FrontDeskAppointmentsPage() {
   const { patients } = useClinicOwnerStore();
   const toast = useToast();
 
-  const [selectedDentist, setSelectedDentist] = useState('Dr. Michael Chen, DDS');
+  const [selectedDentist, setSelectedDentist] = useState('All');
   const [selectedDate, setSelectedDate] = useState(getTodayDateStr());
   
   // Booking modal state
   const [isBookModalOpen, setIsBookModalOpen] = useState(false);
-  const [selectedTime, setSelectedTime] = useState('');
   
   // Booking Form State
-  const [bookingPatientId, setBookingPatientId] = useState('');
-  const [bookingType, setBookingType] = useState('Cleaning');
-  const [bookingNotes, setBookingNotes] = useState('');
-  const [bookingDuration, setBookingDuration] = useState(60);
+  const [modalPatientId, setModalPatientId] = useState('');
+  const [modalDentistName, setModalDentistName] = useState('Dr. Michael Chen, DDS');
+  const [modalDate, setModalDate] = useState(getTodayDateStr());
+  const [modalTime, setModalTime] = useState('09:00');
+  const [modalTreatment, setModalTreatment] = useState('Teeth Cleaning');
+  const [modalNotes, setModalNotes] = useState('');
 
   // Time Slots definition (09:00 AM to 05:00 PM)
   const timeSlots = [
@@ -57,11 +66,14 @@ export function FrontDeskAppointmentsPage() {
   // Filter appointments for the active dentist and date
   const bookedSlots = useMemo(() => {
     const dayApts = appointments.filter(
-      (a) => a.date === selectedDate && a.dentistName.includes(selectedDentist)
+      (a) => a.date === selectedDate && (selectedDentist === 'All' || a.dentistName.includes(selectedDentist))
     );
     const map = {};
     dayApts.forEach((apt) => {
-      map[apt.time] = apt;
+      if (!map[apt.time]) {
+        map[apt.time] = [];
+      }
+      map[apt.time].push(apt);
     });
     return map;
   }, [appointments, selectedDate, selectedDentist]);
@@ -71,39 +83,55 @@ export function FrontDeskAppointmentsPage() {
       toast.error('No patients registered yet. Please register a patient first!');
       return;
     }
-    setSelectedTime(time);
-    setBookingPatientId(patients[0]?.id || '');
+    setModalTime(time);
+    setModalDate(selectedDate);
+    setModalPatientId(patients[0]?.id || '');
+    setModalDentistName(selectedDentist === 'All' ? 'Dr. Michael Chen, DDS' : selectedDentist);
+    setModalTreatment('Teeth Cleaning');
+    setModalNotes('');
+    setIsBookModalOpen(true);
+  };
+
+  const handleOpenAddAppointment = () => {
+    if (patients.length === 0) {
+      toast.error('No patients registered yet. Please register a patient first!');
+      return;
+    }
+    setModalTime('09:00');
+    setModalDate(selectedDate);
+    setModalPatientId(patients[0]?.id || '');
+    setModalDentistName(selectedDentist === 'All' ? 'Dr. Michael Chen, DDS' : selectedDentist);
+    setModalTreatment('Teeth Cleaning');
+    setModalNotes('');
     setIsBookModalOpen(true);
   };
 
   const handleBookAppointment = () => {
-    const patientObj = patients.find((p) => p.id === bookingPatientId);
+    const patientObj = patients.find((p) => p.id === modalPatientId);
     if (!patientObj) {
       toast.error('Invalid patient selection.');
       return;
     }
 
     addAppointment({
-      patientId: bookingPatientId,
+      patientId: modalPatientId,
       patientName: patientObj.name,
-      dentistName: selectedDentist,
+      dentistName: modalDentistName,
       clinicId: patientObj.clinicId || 'clinic-1',
-      date: selectedDate,
-      time: selectedTime,
-      duration: Number(bookingDuration),
+      date: modalDate,
+      time: modalTime,
+      duration: 60,
       status: 'Scheduled',
-      type: bookingType,
-      notes: bookingNotes
+      type: modalTreatment,
+      notes: modalNotes || `${modalTreatment} procedure`
     });
 
     setIsBookModalOpen(false);
-    toast.success(`Appointment scheduled for ${patientObj.name} at ${selectedTime}!`, 'Booking Confirmed');
+    toast.success(`Appointment scheduled for ${patientObj.name} at ${modalTime}!`, 'Booking Confirmed');
     toast.info('SMS Notification automatically dispatched to patient.');
     
     // Reset form
-    setBookingNotes('');
-    setBookingType('Cleaning');
-    setBookingDuration(60);
+    setModalNotes('');
   };
 
   const handleDeleteBooking = (aptId, name) => {
@@ -121,6 +149,16 @@ export function FrontDeskAppointmentsPage() {
           </h2>
           <p className="text-xs text-muted-foreground font-semibold">Perform calendar booking audits, assign practitioners, and log appointments.</p>
         </div>
+        <div>
+          <Button
+            size="sm"
+            onClick={handleOpenAddAppointment}
+            className="font-bold text-xs gap-1.5 h-9 cursor-pointer"
+          >
+            <Plus className="h-4 w-4" />
+            Add Appointment
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -132,6 +170,7 @@ export function FrontDeskAppointmentsPage() {
             onChange={(e) => setSelectedDentist(e.target.value)}
             className="w-full text-xs font-bold bg-muted border border-border rounded-lg p-2.5 focus:outline-none cursor-pointer text-foreground"
           >
+            <option value="All">All Dentists</option>
             <option value="Dr. Michael Chen, DDS">Dr. Michael Chen, DDS</option>
             <option value="Dr. Arthur Vance, DDS">Dr. Arthur Vance, DDS</option>
           </select>
@@ -158,7 +197,7 @@ export function FrontDeskAppointmentsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {timeSlots.map((time) => {
             const booking = bookedSlots[time];
-            const isBooked = !!booking;
+            const isBooked = booking && booking.length > 0;
 
             return (
               <div
@@ -169,41 +208,46 @@ export function FrontDeskAppointmentsPage() {
                     : 'bg-primary/5 hover:bg-primary/10 border-primary/20 hover:border-primary/30'
                 }`}
               >
-                <div className="flex items-center gap-4 text-left">
-                  <span className="text-sm font-black text-primary">{time}</span>
+                <div className="flex items-start gap-4 text-left flex-1 mr-4">
+                  <span className="text-sm font-black text-primary pt-0.5">{time}</span>
                   {isBooked ? (
-                    <div>
-                      <h4 className="font-extrabold text-xs text-foreground">{booking.patientName}</h4>
-                      <p className="text-[10px] text-muted-foreground font-semibold">
-                        {booking.type} &bull; {booking.duration} mins
-                      </p>
+                    <div className="space-y-2 flex-1">
+                      {booking.map((b) => (
+                        <div key={b.id} className="flex items-center justify-between border-b border-border/40 pb-1.5 last:border-0 last:pb-0">
+                          <div>
+                            <h4 className="font-extrabold text-xs text-foreground">{b.patientName}</h4>
+                            <p className="text-[10px] text-muted-foreground font-semibold">
+                              {b.type} &bull; {b.duration} mins &bull; <span className="text-primary font-bold">{b.dentistName}</span>
+                            </p>
+                          </div>
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            onClick={() => handleDeleteBooking(b.id, b.patientName)}
+                            className="text-rose-500 hover:bg-rose-500/10 hover:text-rose-500 font-bold h-7 w-7 p-0 rounded-full flex items-center justify-center cursor-pointer"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      ))}
                     </div>
                   ) : (
-                    <span className="text-xs text-muted-foreground font-semibold">Available Slot</span>
+                    <span className="text-xs text-muted-foreground font-semibold pt-0.5">Available Slot</span>
                   )}
                 </div>
 
-                <div>
-                  {isBooked ? (
-                    <Button
-                      size="xs"
-                      variant="ghost"
-                      onClick={() => handleDeleteBooking(booking.id, booking.patientName)}
-                      className="text-rose-500 hover:bg-rose-500/10 hover:text-rose-500 font-bold"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  ) : (
+                {!isBooked && (
+                  <div>
                     <Button
                       size="xs"
                       onClick={() => handleOpenBookModal(time)}
-                      className="font-bold text-[10px] gap-1 px-3"
+                      className="font-bold text-[10px] gap-1 px-3 cursor-pointer"
                     >
                       <Plus className="h-3.5 w-3.5" />
                       Book Slot
                     </Button>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -214,14 +258,15 @@ export function FrontDeskAppointmentsPage() {
       <Modal
         isOpen={isBookModalOpen}
         onClose={() => setIsBookModalOpen(false)}
-        title={`Book Appointment: ${selectedTime} (${selectedDate})`}
+        title="Schedule New Dental Appointment"
+        size="2xl"
       >
-        <div className="space-y-4 text-left p-1">
+        <div className="space-y-4 text-left p-1 text-xs">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-muted-foreground uppercase block">Select Patient Record</label>
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">SELECT PATIENT</label>
             <select
-              value={bookingPatientId}
-              onChange={(e) => setBookingPatientId(e.target.value)}
+              value={modalPatientId}
+              onChange={(e) => setModalPatientId(e.target.value)}
               className="w-full text-xs font-bold bg-muted border border-border rounded-lg p-2.5 focus:outline-none cursor-pointer text-foreground"
             >
               {patients.map((p) => (
@@ -232,61 +277,87 @@ export function FrontDeskAppointmentsPage() {
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">SELECT DENTIST</label>
+            <select
+              value={modalDentistName}
+              onChange={(e) => setModalDentistName(e.target.value)}
+              className="w-full text-xs font-bold bg-muted border border-border rounded-lg p-2.5 focus:outline-none cursor-pointer text-foreground"
+            >
+              <option value="Dr. Michael Chen, DDS">Dr. Michael Chen, DDS</option>
+              <option value="Dr. Arthur Vance, DDS">Dr. Arthur Vance, DDS</option>
+            </select>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase block">Procedure Type</label>
-              <select
-                value={bookingType}
-                onChange={(e) => setBookingType(e.target.value)}
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">APPOINTMENT DATE</label>
+              <input
+                type="date"
+                value={modalDate}
+                onChange={(e) => setModalDate(e.target.value)}
                 className="w-full text-xs font-bold bg-muted border border-border rounded-lg p-2.5 focus:outline-none cursor-pointer text-foreground"
-              >
-                <option value="Cleaning">Routine Cleaning</option>
-                <option value="Consultation">Clinical Consultation</option>
-                <option value="Filling">Composite Filling</option>
-                <option value="Root Canal">Root Canal Therapy</option>
-                <option value="Crown">Crown Prep & Install</option>
-                <option value="Emergency">Emergency Intake</option>
-              </select>
+                required
+              />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase block">Duration (Mins)</label>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">TIME SLOT</label>
               <select
-                value={bookingDuration}
-                onChange={(e) => setBookingDuration(e.target.value)}
+                value={modalTime}
+                onChange={(e) => setModalTime(e.target.value)}
                 className="w-full text-xs font-bold bg-muted border border-border rounded-lg p-2.5 focus:outline-none cursor-pointer text-foreground"
               >
-                <option value="30">30 minutes</option>
-                <option value="45">45 minutes</option>
-                <option value="60">60 minutes</option>
-                <option value="90">90 minutes</option>
+                {timeSlots.map((ts) => (
+                  <option key={ts} value={ts}>
+                    {formatTimeSlot(ts)}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
 
-          <Input
-            label="Additional Notes"
-            value={bookingNotes}
-            onChange={(e) => setBookingNotes(e.target.value)}
-            placeholder="e.g. Needs sedation compliance..."
-            className="text-xs text-foreground font-medium"
-          />
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">TREATMENT PLAN</label>
+            <select
+              value={modalTreatment}
+              onChange={(e) => setModalTreatment(e.target.value)}
+              className="w-full text-xs font-bold bg-muted border border-border rounded-lg p-2.5 focus:outline-none cursor-pointer text-foreground"
+            >
+              <option value="Teeth Cleaning">Hygiene & Cleaning</option>
+              <option value="Root Canal Therapy">Endodontics (Root Canal)</option>
+              <option value="Orthodontic Checkup">Braces / Orthodontics</option>
+              <option value="Dental Crown Placement">Prosthodontics (Crown)</option>
+              <option value="Consultation">Clinical Consultation</option>
+              <option value="Filling">Composite Filling</option>
+              <option value="Emergency">Emergency Intake</option>
+            </select>
+          </div>
 
-          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-4 w-full">
+          <div className="space-y-1.5">
+            <Input
+              label="Additional Notes"
+              value={modalNotes}
+              onChange={(e) => setModalNotes(e.target.value)}
+              placeholder="e.g. Needs sedation compliance..."
+              className="text-xs text-foreground font-medium"
+            />
+          </div>
+
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-6 w-full">
             <Button
               variant="outline"
-              size="sm"
+              type="button"
               onClick={() => setIsBookModalOpen(false)}
-              className="font-bold text-xs w-full sm:w-auto h-10 sm:h-9"
+              className="font-bold text-xs w-full sm:w-auto h-11 sm:h-10 cursor-pointer"
             >
               Cancel
             </Button>
             <Button
-              size="sm"
               onClick={handleBookAppointment}
-              className="font-bold text-xs w-full sm:w-auto h-10 sm:h-9"
+              className="font-bold text-xs w-full sm:w-auto h-11 sm:h-10 cursor-pointer"
             >
-              Confirm Book Slot
+              Book Slot
             </Button>
           </div>
         </div>
@@ -320,6 +391,7 @@ export function FrontDeskRegistrationPage() {
   const [gender, setGender] = useState('Male');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [address, setAddress] = useState('');
   const [allergies, setAllergies] = useState('');
   const [insurance, setInsurance] = useState('');
@@ -339,6 +411,7 @@ export function FrontDeskRegistrationPage() {
     setGender('Male');
     setPhone('');
     setEmail('');
+    setPassword('');
     setAddress('');
     setAllergies('');
     setInsurance('');
@@ -353,6 +426,7 @@ export function FrontDeskRegistrationPage() {
     setGender(patient.gender);
     setPhone(patient.phone);
     setEmail(patient.email);
+    setPassword(patient.password || '');
     setAddress(patient.address || '');
     setAllergies(patient.allergies ? patient.allergies.join(', ') : '');
     setInsurance(patient.insuranceProvider || '');
@@ -369,8 +443,8 @@ export function FrontDeskRegistrationPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name || !phone || !email) {
-      toast.error('Please complete required fields (Name, Phone, Email)!');
+    if (!name || !phone || !email || (!editingPatient && !password)) {
+      toast.error('Please complete required fields (Name, Phone, Email, Password)!');
       return;
     }
 
@@ -386,6 +460,7 @@ export function FrontDeskRegistrationPage() {
       gender,
       phone,
       email,
+      password,
       address,
       allergies: allergyArr,
       insuranceProvider: insurance || 'None',
@@ -409,6 +484,7 @@ export function FrontDeskRegistrationPage() {
     setGender('Male');
     setPhone('');
     setEmail('');
+    setPassword('');
     setAddress('');
     setAllergies('');
     setInsurance('');
@@ -567,7 +643,7 @@ export function FrontDeskRegistrationPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Input
               label="Contact Phone Number *"
               value={phone}
@@ -583,6 +659,15 @@ export function FrontDeskRegistrationPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="e.g. arthur@galaxy.com"
               required
+              className="text-xs text-foreground font-medium"
+            />
+            <Input
+              label="Account Password *"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Create login password"
+              required={!editingPatient}
               className="text-xs text-foreground font-medium"
             />
           </div>

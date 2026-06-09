@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Activity, Building2, User, ArrowLeft, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Activity, Building2, User, ArrowLeft, ShieldAlert, CheckCircle2, Users, ShieldCheck } from 'lucide-react';
 import { useSuperAdminStore } from '../../store/superAdminStore';
 import { Button } from '../../shared/ui/Button';
 import { Input } from '../../shared/ui/Input';
@@ -28,6 +28,11 @@ export function RegisterPage() {
   const [patientEmail, setPatientEmail] = useState('');
   const [patientPhone, setPatientPhone] = useState('');
   const [patientPassword, setPatientPassword] = useState('');
+  const [patientAge, setPatientAge] = useState('');
+  const [patientGender, setPatientGender] = useState('Male');
+  const [patientAddress, setPatientAddress] = useState('');
+  const [patientAllergies, setPatientAllergies] = useState('');
+  const [patientInsurance, setPatientInsurance] = useState('');
   const [selectedClinic, setSelectedClinic] = useState(clinics[0]?.id || 'clinic-1');
 
   const handleSubmit = (e) => {
@@ -67,8 +72,8 @@ export function RegisterPage() {
       toast.success('Clinic Registration Request Submitted Successfully!');
       setIsSubmitted(true);
     } else {
-      if (!patientName || !patientEmail || !patientPassword) {
-        toast.error('Please fill in all required fields');
+      if (!patientName || !patientEmail || !patientPassword || !patientPhone) {
+        toast.error('Please fill in all required fields (Name, Phone, Email, Password)');
         return;
       }
 
@@ -86,7 +91,7 @@ export function RegisterPage() {
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-indigo-500/20 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative w-full max-w-lg bg-card border border-border p-6 sm:p-8 rounded-2xl shadow-xl z-10 animate-fade-in text-center">
+      <div className={`relative w-full ${regType === 'patient' ? 'max-w-2xl' : 'max-w-lg'} transition-all duration-300 bg-card border border-border p-6 sm:p-8 rounded-2xl shadow-xl z-10 animate-fade-in text-center`}>
         {/* Back Arrow */}
         <button
           onClick={() => navigate('/')}
@@ -205,40 +210,106 @@ export function RegisterPage() {
                 </>
               ) : (
                 <>
-                  <div className="border-b border-border pb-2 mb-3">
-                    <span className="text-[10px] uppercase font-bold text-primary tracking-wider">Patient Information</span>
-                  </div>
-                  <Input
-                    label="Full Name"
-                    value={patientName}
-                    onChange={(e) => setPatientName(e.target.value)}
-                    required
-                    placeholder="e.g. Robert Pattinson"
-                  />
+                  <h3 className="font-extrabold text-sm text-primary uppercase tracking-wider border-b border-border pb-2 flex items-center gap-1">
+                    <Users className="h-4.5 w-4.5" />
+                    1. Demographics & Contact details
+                  </h3>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Input
-                      label="Email Address"
-                      type="email"
-                      value={patientEmail}
-                      onChange={(e) => setPatientEmail(e.target.value)}
+                      label="Patient Full Name *"
+                      value={patientName}
+                      onChange={(e) => setPatientName(e.target.value)}
+                      placeholder="e.g. Robert Pattinson"
                       required
-                      placeholder="e.g. rob@gmail.com"
+                      className="text-xs text-foreground font-medium"
                     />
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input
+                        label="Age"
+                        type="number"
+                        value={patientAge}
+                        onChange={(e) => setPatientAge(e.target.value)}
+                        placeholder="e.g. 30"
+                        className="text-xs text-foreground font-medium"
+                      />
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Gender</label>
+                        <select
+                          value={patientGender}
+                          onChange={(e) => setPatientGender(e.target.value)}
+                          className="w-full text-xs font-bold bg-muted border border-border rounded-lg p-2.5 focus:outline-none cursor-pointer text-foreground"
+                        >
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <Input
-                      label="Phone Number"
+                      label="Contact Phone Number *"
                       value={patientPhone}
                       onChange={(e) => setPatientPhone(e.target.value)}
                       placeholder="e.g. (312) 555-0144"
+                      required
+                      className="text-xs text-foreground font-medium"
+                    />
+                    <Input
+                      label="Email Address *"
+                      type="email"
+                      value={patientEmail}
+                      onChange={(e) => setPatientEmail(e.target.value)}
+                      placeholder="e.g. rob@gmail.com"
+                      required
+                      className="text-xs text-foreground font-medium"
+                    />
+                    <Input
+                      label="Account Password *"
+                      type="password"
+                      value={patientPassword}
+                      onChange={(e) => setPatientPassword(e.target.value)}
+                      placeholder="Create login password"
+                      required
+                      className="text-xs text-foreground font-medium"
                     />
                   </div>
+
                   <Input
-                    label="Account Password"
-                    type="password"
-                    value={patientPassword}
-                    onChange={(e) => setPatientPassword(e.target.value)}
-                    required
-                    placeholder="Create patient login password"
+                    label="Residential Address"
+                    value={patientAddress}
+                    onChange={(e) => setPatientAddress(e.target.value)}
+                    placeholder="e.g. Country Lane, Cottington, UK"
+                    className="text-xs text-foreground font-medium"
                   />
+
+                  <h3 className="font-extrabold text-sm text-primary uppercase tracking-wider border-b border-border pb-2 pt-4 flex items-center gap-1">
+                    <ShieldCheck className="h-4.5 w-4.5" />
+                    2. Medical Summary & Insurance Eligibility
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Input
+                      label="Known Allergies (comma separated)"
+                      value={patientAllergies}
+                      onChange={(e) => setPatientAllergies(e.target.value)}
+                      placeholder="e.g. Penicillin, Latex"
+                      className="text-xs text-foreground font-medium"
+                    />
+                    <Input
+                      label="Insurance Provider Name"
+                      value={patientInsurance}
+                      onChange={(e) => setPatientInsurance(e.target.value)}
+                      placeholder="e.g. Blue Cross Blue Shield"
+                      className="text-xs text-foreground font-medium"
+                    />
+                  </div>
+
+                  <div className="border-b border-border pb-2 pt-4 mb-3">
+                    <span className="text-[10px] uppercase font-bold text-primary tracking-wider">Preferred Clinic Location</span>
+                  </div>
                   <Select
                     label="Select Preferred Clinic Location"
                     value={selectedClinic}

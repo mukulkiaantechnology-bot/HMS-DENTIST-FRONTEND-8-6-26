@@ -137,11 +137,15 @@ export function DentistSidebar({ isMobileOpen, onClose }) {
             
             // Custom isActive logic because of query parameters
             const query = new URLSearchParams(location.search);
-            const currentTab = query.get('tab') || 'overview';
-            const isOverviewTab = currentTab === 'overview' && item.key === 'patients';
+            const currentTab = query.get('tab');
+            
+            const isDashboardActive = item.key === 'dashboard' && location.pathname === '/dentist/dashboard';
+            const isAppointmentsActive = item.key === 'appointments' && location.pathname === '/dentist/appointments';
+            const isRegistryActive = item.key === 'patients' && location.pathname === '/dentist/patients';
             const isTabActive = location.pathname.includes('/dentist/patients/') && currentTab === item.key;
-            const isRegistryActive = location.pathname === '/dentist/patients' && item.key === 'patients';
-            const isActive = isTabActive || isRegistryActive || isOverviewTab;
+            const isOverviewActive = item.key === 'patients' && location.pathname.includes('/dentist/patients/') && !currentTab;
+            
+            const isActive = isDashboardActive || isAppointmentsActive || isRegistryActive || isTabActive || isOverviewActive;
 
             return (
               <NavLink

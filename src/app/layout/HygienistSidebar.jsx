@@ -134,17 +134,15 @@ export function HygienistSidebar({ isMobileOpen, onClose }) {
             
             // Custom isActive logic because of query parameters
             const query = new URLSearchParams(location.search);
-            const currentTab = query.get('tab') || 'overview';
-            const isOverviewTab = currentTab === 'overview' && item.key === 'patients';
-            const isTabActive = location.pathname.includes('/hygienist/patients/') && currentTab === item.key;
-            const isRegistryActive = location.pathname === '/hygienist/patients' && item.key === 'patients';
+            const currentTab = query.get('tab');
             
-            const isActive = 
-              (item.key === 'dashboard' && location.pathname === '/hygienist/dashboard') ||
-              (item.key === 'recall_list' && location.pathname === '/hygienist/recall') ||
-              (item.key === 'patients' && isRegistryActive) ||
-              isTabActive ||
-              (item.key === 'patients' && isOverviewTab);
+            const isDashboardActive = item.key === 'dashboard' && location.pathname === '/hygienist/dashboard';
+            const isRecallActive = item.key === 'recall_list' && location.pathname === '/hygienist/recall';
+            const isRegistryActive = item.key === 'patients' && location.pathname === '/hygienist/patients';
+            const isTabActive = location.pathname.includes('/hygienist/patients/') && currentTab === item.key;
+            const isOverviewActive = item.key === 'patients' && location.pathname.includes('/hygienist/patients/') && !currentTab;
+            
+            const isActive = isDashboardActive || isRecallActive || isRegistryActive || isTabActive || isOverviewActive;
 
             return (
               <NavLink

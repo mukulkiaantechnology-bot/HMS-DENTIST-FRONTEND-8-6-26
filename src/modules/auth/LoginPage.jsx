@@ -50,7 +50,7 @@ export function LoginPage() {
         navigate('/clinic/dashboard');
       } else if (result.role === 'dentist') {
         toast.success('Successfully signed in as Dentist', 'Clinical Workspace Enabled');
-        navigate('/dentist/patients');
+        navigate('/dentist/dashboard');
       } else if (result.role === 'hygienist') {
         toast.success('Successfully signed in as Hygienist', 'Preventive Workspace Enabled');
         navigate('/hygienist/dashboard');
@@ -78,41 +78,98 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-8 transition-colors duration-300 relative">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-4 md:py-8 transition-colors duration-300 relative">
       {/* Background gradients */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40 dark:opacity-25">
         <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-indigo-500/20 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative w-full max-w-lg bg-card border border-border p-6 sm:p-8 rounded-2xl shadow-xl z-10 animate-fade-in text-center">
+      <div className="relative w-full max-w-lg md:max-w-4xl bg-card border border-border p-5 sm:p-6 md:p-8 rounded-2xl shadow-xl z-10 animate-fade-in flex flex-col md:grid md:grid-cols-12 md:gap-8">
+        
         {/* Back Arrow */}
         <button
           onClick={() => navigate('/')}
-          className="absolute left-6 top-6 flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+          className="absolute left-6 top-6 flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer transition-colors z-20"
         >
           <Icons.ArrowLeft className="h-4 w-4" />
           Home
         </button>
 
-        {/* Brand */}
-        <div className="flex justify-center mb-6 mt-8 sm:mt-4">
-          <div className="bg-primary text-primary-foreground p-3 rounded-2xl shadow-md">
-            <Icons.Activity className="h-7 w-7" />
+        {/* Left Column: Form & Brand */}
+        <div className="md:col-span-6 flex flex-col justify-between pt-8 md:pt-4">
+          <div className="text-center md:text-left">
+            {/* Brand */}
+            <div className="flex justify-center md:justify-start mb-3">
+              <div className="bg-primary text-primary-foreground p-2 rounded-xl shadow-md">
+                <Icons.Activity className="h-5.5 w-5.5" />
+              </div>
+            </div>
+
+            <h1 className="text-xl font-bold tracking-tight text-foreground">HMS HQ Control</h1>
+            <p className="text-[10px] text-muted-foreground mt-1 font-semibold">
+              Enterprise Network Command Console
+            </p>
+          </div>
+
+          <form onSubmit={handleLogin} className="mt-5 space-y-4 text-left flex-grow flex flex-col justify-between">
+            <div className="space-y-3">
+              <Input
+                label="Email Address"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="enter account email"
+                className="h-9 text-xs"
+              />
+
+              <Input
+                label="Account Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="enter account password"
+                className="h-9 text-xs"
+              />
+
+              <div className="p-2.5 bg-muted border border-border rounded-lg text-left flex items-start gap-2">
+                <Icons.Key className="h-3.5 w-3.5 text-primary flex-shrink-0 mt-0.5" />
+                <div className="text-[9px] text-muted-foreground font-semibold leading-normal">
+                  Super Admin logs in with `admin123`. Clinic Owner accounts require Super Admin approval prior to activation.
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <Button type="submit" className="w-full h-9.5 gap-2 font-bold select-none cursor-pointer mt-3 text-xs bg-primary text-white hover:bg-primary/90">
+                Access HQ Sandbox
+                <Icons.ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </form>
+
+          <div className="mt-4 flex flex-col gap-1 text-[11px] border-t border-border pt-3 text-center md:text-left">
+            <span className="text-muted-foreground font-semibold">Need to register a clinic location?</span>
+            <button
+              onClick={() => navigate('/register')}
+              className="text-primary hover:underline font-bold cursor-pointer self-center md:self-start"
+            >
+              Register New Clinic or Patient &rarr;
+            </button>
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">HMS CoreSaaS</h1>
-        <p className="text-xs text-muted-foreground mt-2 font-semibold">
-          Multi-Clinic Hospital Management Platform
-        </p>
-
-        <form onSubmit={handleLogin} className="mt-8 space-y-5 text-left">
-          {/* Grid Selector */}
-          <div className="space-y-2.5">
-            <label className="text-[10px] uppercase text-muted-foreground font-black tracking-wider block">
+        {/* Right Column: Profiles Quick Select */}
+        <div className="md:col-span-6 border-t md:border-t-0 md:border-l border-border pt-6 md:pt-4 md:pl-8 flex flex-col justify-between mt-6 md:mt-0">
+          <div className="space-y-3">
+            <label className="text-[9px] uppercase text-muted-foreground font-black tracking-wider block text-center md:text-left">
               Sandbox Quick-Select Profiles
             </label>
+            <p className="text-[10px] text-muted-foreground font-semibold text-center md:text-left leading-normal hidden md:block">
+              Click any profile key below to auto-populate sandboxed developer credentials.
+            </p>
             <div className="grid grid-cols-3 gap-2">
               {demoProfiles.map((prof) => {
                 const Icon = Icons[prof.icon] || Icons.Shield;
@@ -122,14 +179,14 @@ export function LoginPage() {
                     key={prof.key}
                     type="button"
                     onClick={() => handleProfileSelect(prof)}
-                    className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all cursor-pointer text-center relative ${
+                    className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all cursor-pointer text-center relative ${
                       isSelected
                         ? 'border-primary ring-2 ring-primary/25 bg-primary/5 scale-102 shadow-xs'
                         : 'border-border bg-card hover:bg-muted/50 hover:border-border/80'
                     }`}
                   >
-                    <div className={`p-1.5 rounded-lg mb-1.5 ${prof.color}`}>
-                      <Icon className="h-4 w-4" />
+                    <div className={`p-1 rounded-lg mb-1 ${prof.color}`}>
+                      <Icon className="h-3.5 w-3.5" />
                     </div>
                     <span className="text-[9px] font-black text-foreground uppercase tracking-wide truncate max-w-full">
                       {prof.label}
@@ -143,54 +200,15 @@ export function LoginPage() {
             </div>
           </div>
 
-          <div className="h-px bg-border my-2" />
-
-          <Input
-            label="Email Address"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            placeholder="enter account email"
-          />
-
-          <Input
-            label="Account Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            placeholder="enter account password"
-          />
-
-          <div className="p-3 bg-muted border border-border rounded-lg text-left flex items-start gap-2.5">
-            <Icons.Key className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-            <div className="text-[10px] text-muted-foreground font-semibold leading-relaxed">
-              Super Admin logs in with `admin123`. Registered clinic owner accounts require Super Admin approval prior to authentication.
-            </div>
+          <div className="mt-4 text-[9px] text-muted-foreground font-semibold text-center md:text-left border-t border-border/40 pt-3 md:border-t-0 md:pt-0">
+            Demo Sandboxed Session. Credentials pre-filled for easy testing.
           </div>
-
-          <Button type="submit" className="w-full h-11 gap-2 font-bold select-none cursor-pointer mt-4">
-            Access System Sandbox
-            <Icons.ArrowRight className="h-4 w-4" />
-          </Button>
-        </form>
-
-        <div className="mt-6 flex flex-col gap-2 text-xs border-t border-border pt-4">
-          <span className="text-muted-foreground font-semibold">Need to register a clinic location?</span>
-          <button
-            onClick={() => navigate('/register')}
-            className="text-primary hover:underline font-bold cursor-pointer"
-          >
-            Register New Clinic or Patient &rarr;
-          </button>
         </div>
 
-        <div className="mt-6 text-[10px] text-muted-foreground font-semibold">
-          Demo Sandboxed Session. Credentials pre-filled for easy testing.
-        </div>
       </div>
     </div>
   );
 }
+
 export default LoginPage;
+

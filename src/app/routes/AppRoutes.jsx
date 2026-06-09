@@ -79,7 +79,7 @@ function NotFoundPage() {
   const dashboardPath = user?.role === 'clinic_owner'
     ? '/clinic/dashboard'
     : user?.role === 'dentist'
-    ? '/dentist/patients'
+    ? '/dentist/dashboard'
     : user?.role === 'hygienist'
     ? '/hygienist/dashboard'
     : user?.role === 'front_desk' || user?.role === 'frontdesk'
@@ -118,7 +118,7 @@ export function AppRoutes() {
   const getDashboardRedirect = () => {
     if (!user) return '/login';
     if (user.role === 'clinic_owner') return '/clinic/dashboard';
-    if (user.role === 'dentist') return '/dentist/patients';
+    if (user.role === 'dentist') return '/dentist/dashboard';
     if (user.role === 'hygienist') return '/hygienist/dashboard';
     if (user.role === 'front_desk' || user.role === 'frontdesk') return '/frontdesk/dashboard';
     if (user.role === 'billing_staff') return '/billing';

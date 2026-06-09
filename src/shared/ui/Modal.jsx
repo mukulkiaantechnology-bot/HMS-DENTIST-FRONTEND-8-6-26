@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Button } from './Button';
 
-export function Modal({ isOpen, onClose, title, children }) {
+export function Modal({ isOpen, onClose, title, size = 'lg', children }) {
   // Close on Escape key press
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -20,6 +20,15 @@ export function Modal({ isOpen, onClose, title, children }) {
 
   if (!isOpen) return null;
 
+  const sizeClasses = {
+    sm: 'md:max-w-sm',
+    md: 'md:max-w-md',
+    lg: 'md:max-w-lg',
+    xl: 'md:max-w-xl',
+    '2xl': 'md:max-w-2xl',
+  };
+  const sizeClass = sizeClasses[size] || 'md:max-w-lg';
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-4">
       {/* Backdrop */}
@@ -29,7 +38,7 @@ export function Modal({ isOpen, onClose, title, children }) {
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full h-full md:h-auto md:max-w-lg rounded-none md:rounded-xl border-none md:border border-border bg-card p-4 md:p-6 shadow-lg z-10 animate-scale-in text-left flex flex-col">
+      <div className={`relative w-full h-full md:h-auto ${sizeClass} rounded-none md:rounded-xl border-none md:border border-border bg-card p-4 md:p-6 shadow-lg z-10 animate-scale-in text-left flex flex-col`}>
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-border flex-shrink-0">
           <h3 className="text-base md:text-lg font-extrabold text-foreground truncate">{title}</h3>

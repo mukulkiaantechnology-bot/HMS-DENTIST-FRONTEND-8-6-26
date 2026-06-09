@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Users,
   Plus,
@@ -15,7 +15,8 @@ import {
   Download,
   AlertCircle,
   Filter,
-  Clock
+  Clock,
+  ShieldCheck
 } from 'lucide-react';
 import {
   BarChart,
@@ -32,6 +33,8 @@ import {
 } from 'recharts';
 import { useClinicOwnerStore } from '../../../store/clinicOwnerStore';
 import { useBillingStore } from '../../../store/billingStore';
+import { useAuthStore } from '../../../store/authStore';
+import { useSuperAdminStore } from '../../../store/superAdminStore';
 import { DataTable } from '../../../shared/ui/DataTable';
 import { Button } from '../../../shared/ui/Button';
 import { Input } from '../../../shared/ui/Input';
@@ -62,14 +65,26 @@ export function ClinicPatientsPage() {
 
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
+  const [gender, setGender] = useState('Male');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [address, setAddress] = useState('');
+  const [allergies, setAllergies] = useState('');
+  const [insurance, setInsurance] = useState('');
+  const [status, setStatus] = useState('Active');
 
   const handleOpenAdd = () => {
     setName('');
     setAge('');
+    setGender('Male');
     setPhone('');
     setEmail('');
+    setPassword('');
+    setAddress('');
+    setAllergies('');
+    setInsurance('');
+    setStatus('Active');
     setIsAddOpen(true);
   };
 
@@ -77,15 +92,40 @@ export function ClinicPatientsPage() {
     setActivePat(pat);
     setName(pat.name);
     setAge(String(pat.age));
+    setGender(pat.gender || 'Male');
     setPhone(pat.phone);
     setEmail(pat.email);
+    setPassword(pat.password || '');
+    setAddress(pat.address || '');
+    setAllergies(pat.allergies ? pat.allergies.join(', ') : '');
+    setInsurance(pat.insuranceProvider || '');
+    setStatus(pat.status || 'Active');
     setIsEditOpen(true);
   };
 
   const handleAddSubmit = (e) => {
     e.preventDefault();
-    if (!name) return;
-    addPatient({ name, age: Number(age) || 0, phone, email });
+    if (!name || !phone || !email || !password) {
+      toast.error('Please complete required fields (Name, Phone, Email, Password)!');
+      return;
+    }
+
+    const allergyArr = allergies
+      ? allergies.split(',').map((a) => a.trim()).filter(Boolean)
+      : [];
+
+    addPatient({
+      name,
+      age: Number(age) || 30,
+      gender,
+      phone,
+      email,
+      password,
+      address,
+      allergies: allergyArr,
+      insuranceProvider: insurance || 'None',
+      status: 'Active'
+    });
     toast.success(`Registered patient: ${name}`);
     setIsAddOpen(false);
   };
@@ -93,7 +133,27 @@ export function ClinicPatientsPage() {
   const handleEditSubmit = (e) => {
     e.preventDefault();
     if (!activePat) return;
-    updatePatient(activePat.id, { name, age: Number(age) || 0, phone, email });
+    if (!name || !phone || !email) {
+      toast.error('Please complete required fields (Name, Phone, Email)!');
+      return;
+    }
+
+    const allergyArr = allergies
+      ? allergies.split(',').map((a) => a.trim()).filter(Boolean)
+      : [];
+
+    updatePatient(activePat.id, {
+      name,
+      age: Number(age) || 30,
+      gender,
+      phone,
+      email,
+      password,
+      address,
+      allergies: allergyArr,
+      insuranceProvider: insurance || 'None',
+      status
+    });
     toast.success(`Updated details for patient: ${name}`);
     setIsEditOpen(false);
   };
@@ -150,33 +210,246 @@ export function ClinicPatientsPage() {
       </div>
 
       {/* Add Modal */}
-      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Register Patient Profile">
-        <form onSubmit={handleAddSubmit} className="space-y-4 flex flex-col h-full animate-fade-in">
-          <Input label="FULL NAME" value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. John Doe" />
+      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Register Patient Profile" size="2xl">
+        <form onSubmit={handleAddSubmit} className="space-y-4 flex flex-col h-full animate-fade-in text-xs">
+          
+          <h3 className="font-extrabold text-sm text-primary uppercase tracking-wider border-b border-border pb-2 flex items-center gap-1">
+            <Users className="h-4.5 w-4.5" />
+            1. Demographics & Contact details
+          </h3>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input label="AGE" type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="e.g. 30" />
-            <Input label="PHONE NUMBER" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="e.g. (206) 555-1122" />
+            <Input
+              label="Patient Full Name *"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Arthur Dent"
+              required
+              className="text-xs text-foreground font-medium"
+            />
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                label="Age"
+                type="number"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                placeholder="e.g. 42"
+                className="text-xs text-foreground font-medium"
+              />
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Gender</label>
+                <select
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  className="w-full text-xs font-bold bg-muted border border-border rounded-lg p-2.5 focus:outline-none cursor-pointer text-foreground"
+                >
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <Input label="EMAIL ADDRESS" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="e.g. john@gmail.com" />
-          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
-            <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Register Patient</Button>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Input
+              label="Contact Phone Number *"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="e.g. (206) 555-4242"
+              required
+              className="text-xs text-foreground font-medium"
+            />
+            <Input
+              label="Email Address *"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="e.g. arthur@galaxy.com"
+              required
+              className="text-xs text-foreground font-medium"
+            />
+            <Input
+              label="Account Password *"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Create login password"
+              required
+              className="text-xs text-foreground font-medium"
+            />
+          </div>
+
+          <Input
+            label="Residential Address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="e.g. Country Lane, Cottington, UK"
+            className="text-xs text-foreground font-medium"
+          />
+
+          <h3 className="font-extrabold text-sm text-primary uppercase tracking-wider border-b border-border pb-2 pt-4 flex items-center gap-1">
+            <ShieldCheck className="h-4.5 w-4.5" />
+            2. Medical Summary & Insurance Eligibility
+          </h3>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Known Allergies (comma separated)"
+              value={allergies}
+              onChange={(e) => setAllergies(e.target.value)}
+              placeholder="e.g. Penicillin, Latex"
+              className="text-xs text-foreground font-medium"
+            />
+            <Input
+              label="Insurance Provider Name"
+              value={insurance}
+              onChange={(e) => setInsurance(e.target.value)}
+              placeholder="e.g. Blue Cross Blue Shield"
+              className="text-xs text-foreground font-medium"
+            />
+          </div>
+
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-6 w-full">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsAddOpen(false)}
+              className="font-bold text-xs w-full sm:w-auto h-11 sm:h-10 cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button type="submit" className="font-bold text-xs w-full sm:w-auto h-11 sm:h-10 cursor-pointer">
+              Register Patient
+            </Button>
           </div>
         </form>
       </Modal>
 
       {/* Edit Modal */}
-      <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="Modify Patient Profile">
-        <form onSubmit={handleEditSubmit} className="space-y-4 flex flex-col h-full animate-fade-in">
-          <Input label="FULL NAME" value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. John Doe" />
+      <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="Modify Patient Profile" size="2xl">
+        <form onSubmit={handleEditSubmit} className="space-y-4 flex flex-col h-full animate-fade-in text-xs">
+          
+          <h3 className="font-extrabold text-sm text-primary uppercase tracking-wider border-b border-border pb-2 flex items-center gap-1">
+            <Users className="h-4.5 w-4.5" />
+            1. Demographics & Contact details
+          </h3>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input label="AGE" type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="e.g. 30" />
-            <Input label="PHONE NUMBER" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="e.g. (206) 555-1122" />
+            <Input
+              label="Patient Full Name *"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Arthur Dent"
+              required
+              className="text-xs text-foreground font-medium"
+            />
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                label="Age"
+                type="number"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                placeholder="e.g. 42"
+                className="text-xs text-foreground font-medium"
+              />
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Gender</label>
+                <select
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  className="w-full text-xs font-bold bg-muted border border-border rounded-lg p-2.5 focus:outline-none cursor-pointer text-foreground"
+                >
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <Input label="EMAIL ADDRESS" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="e.g. john@gmail.com" />
-          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
-            <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
-            <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Save Changes</Button>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Input
+              label="Contact Phone Number *"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="e.g. (206) 555-4242"
+              required
+              className="text-xs text-foreground font-medium"
+            />
+            <Input
+              label="Email Address *"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="e.g. arthur@galaxy.com"
+              required
+              className="text-xs text-foreground font-medium"
+            />
+            <Input
+              label="Account Password *"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Update login password"
+              className="text-xs text-foreground font-medium"
+            />
+          </div>
+
+          <Input
+            label="Residential Address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="e.g. Country Lane, Cottington, UK"
+            className="text-xs text-foreground font-medium"
+          />
+
+          <h3 className="font-extrabold text-sm text-primary uppercase tracking-wider border-b border-border pb-2 pt-4 flex items-center gap-1">
+            <ShieldCheck className="h-4.5 w-4.5" />
+            2. Medical Summary & Insurance Eligibility
+          </h3>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Known Allergies (comma separated)"
+              value={allergies}
+              onChange={(e) => setAllergies(e.target.value)}
+              placeholder="e.g. Penicillin, Latex"
+              className="text-xs text-foreground font-medium"
+            />
+            <Input
+              label="Insurance Provider Name"
+              value={insurance}
+              onChange={(e) => setInsurance(e.target.value)}
+              placeholder="e.g. Blue Cross Blue Shield"
+              className="text-xs text-foreground font-medium"
+            />
+          </div>
+
+          <div className="space-y-1 pt-2">
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Patient File Status</label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="w-full text-xs font-bold bg-muted border border-border rounded-lg p-2.5 focus:outline-none cursor-pointer text-foreground"
+            >
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-6 w-full">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsEditOpen(false)}
+              className="font-bold text-xs w-full sm:w-auto h-11 sm:h-10 cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button type="submit" className="font-bold text-xs w-full sm:w-auto h-11 sm:h-10 cursor-pointer">
+              Save Changes
+            </Button>
           </div>
         </form>
       </Modal>
@@ -199,6 +472,7 @@ export function ClinicAppointmentsPage() {
   const [date, setDate] = useState('');
   const [treatment, setTreatment] = useState('Teeth Cleaning');
   const [status, setStatus] = useState('Confirmed');
+  const [notes, setNotes] = useState('');
 
   // Calendar states
   const [viewMode, setViewMode] = useState('calendar'); // 'list' | 'calendar'
@@ -211,6 +485,7 @@ export function ClinicAppointmentsPage() {
     setTime('09:00 AM');
     setDate('2026-06-08');
     setTreatment('Teeth Cleaning');
+    setNotes('');
     setIsAddOpen(true);
   };
 
@@ -221,6 +496,7 @@ export function ClinicAppointmentsPage() {
     setTime(slotLabel);
     setDate(selectedDate);
     setTreatment('Teeth Cleaning');
+    setNotes('');
     setIsAddOpen(true);
   };
 
@@ -232,12 +508,13 @@ export function ClinicAppointmentsPage() {
     setDate(apt.date);
     setTreatment(apt.treatment);
     setStatus(apt.status);
+    setNotes(apt.notes || '');
     setIsEditOpen(true);
   };
 
   const handleAddSubmit = (e) => {
     e.preventDefault();
-    addAppointment({ patientName, dentistName, time, date, treatment });
+    addAppointment({ patientName, dentistName, time, date, treatment, notes });
     toast.success(`Booked appointment for ${patientName}`);
     setIsAddOpen(false);
   };
@@ -245,7 +522,7 @@ export function ClinicAppointmentsPage() {
   const handleEditSubmit = (e) => {
     e.preventDefault();
     if (!activeApt) return;
-    updateAppointment(activeApt.id, { patientName, dentistName, time, date, treatment, status });
+    updateAppointment(activeApt.id, { patientName, dentistName, time, date, treatment, status, notes });
     toast.success(`Rescheduled appointment for ${patientName}`);
     setIsEditOpen(false);
   };
@@ -493,7 +770,7 @@ export function ClinicAppointmentsPage() {
       )}
 
       {/* Book Appointment Modal */}
-      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Schedule New Dental Appointment">
+      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Schedule New Dental Appointment" size="2xl">
         <form onSubmit={handleAddSubmit} className="space-y-4 flex flex-col h-full animate-fade-in">
           <Select
             label="SELECT PATIENT"
@@ -522,6 +799,13 @@ export function ClinicAppointmentsPage() {
               { value: 'Dental Crown Placement', label: 'Prosthodontics (Crown)' }
             ]}
           />
+          <Input
+            label="ADDITIONAL NOTES"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="e.g. Needs sedation compliance..."
+            className="text-xs text-foreground font-medium"
+          />
           <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
             <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
             <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Book Slot</Button>
@@ -530,7 +814,7 @@ export function ClinicAppointmentsPage() {
       </Modal>
 
       {/* Edit Appointment Modal */}
-      <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="Reschedule Appointment Settings">
+      <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="Reschedule Appointment Settings" size="2xl">
         {activeApt && (
           <form onSubmit={handleEditSubmit} className="space-y-4 flex flex-col h-full animate-fade-in">
             <Select
@@ -570,6 +854,13 @@ export function ClinicAppointmentsPage() {
                 { value: 'Pending', label: 'Pending Request' },
                 { value: 'Cancelled', label: 'Cancelled' }
               ]}
+            />
+            <Input
+              label="ADDITIONAL NOTES"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="e.g. Needs sedation compliance..."
+              className="text-xs text-foreground font-medium"
             />
             <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
               <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
@@ -1082,6 +1373,7 @@ export function ClinicStaffPage() {
   const [speciality, setSpeciality] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleOpenAdd = () => {
     setName('');
@@ -1089,6 +1381,7 @@ export function ClinicStaffPage() {
     setSpeciality('');
     setPhone('');
     setEmail('');
+    setPassword('');
     setIsAddOpen(true);
   };
 
@@ -1099,13 +1392,14 @@ export function ClinicStaffPage() {
     setSpeciality(stf.speciality);
     setPhone(stf.phone);
     setEmail(stf.email);
+    setPassword(stf.password || '');
     setIsEditOpen(true);
   };
 
   const handleAddSubmit = (e) => {
     e.preventDefault();
     if (!name) return;
-    addStaff({ name, role, speciality, phone, email });
+    addStaff({ name, role, speciality, phone, email, password });
     toast.success(`Added employee credentials: ${name}`);
     setIsAddOpen(false);
   };
@@ -1113,7 +1407,7 @@ export function ClinicStaffPage() {
   const handleEditSubmit = (e) => {
     e.preventDefault();
     if (!activeStf) return;
-    updateStaff(activeStf.id, { name, role, speciality, phone, email });
+    updateStaff(activeStf.id, { name, role, speciality, phone, email, password });
     toast.success(`Updated details for employee: ${name}`);
     setIsEditOpen(false);
   };
@@ -1170,7 +1464,7 @@ export function ClinicStaffPage() {
       </div>
 
       {/* Add Modal */}
-      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Register Clinic Employee">
+      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Register Clinic Employee" size="2xl">
         <form onSubmit={handleAddSubmit} className="space-y-4 flex flex-col h-full">
           <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. Dr. Robert Miller" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1182,7 +1476,9 @@ export function ClinicStaffPage() {
                 { value: 'Dentist', label: 'Dentist (DDS/DMD)' },
                 { value: 'Hygienist', label: 'Hygienist (RDH)' },
                 { value: 'Assistant', label: 'Dental Assistant' },
-                { value: 'Front Desk', label: 'Receptionist' }
+                { value: 'Front Desk', label: 'Front Desk' },
+                { value: 'Billing Staff', label: 'Billing Staff' },
+                { value: 'Lab Coordinator', label: 'Lab Coordinator' }
               ]}
             />
             <Input label="Speciality Field" value={speciality} onChange={(e) => setSpeciality(e.target.value)} placeholder="e.g. Orthodontics, Surgery" />
@@ -1191,6 +1487,7 @@ export function ClinicStaffPage() {
             <Input label="Phone Contact" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="e.g. (206) 555-4433" />
             <Input label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="e.g. robert@clinic.com" />
           </div>
+          <Input label="Account Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Create login password for employee" />
           <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
             <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
             <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Create Employee</Button>
@@ -1199,7 +1496,7 @@ export function ClinicStaffPage() {
       </Modal>
 
       {/* Edit Modal */}
-      <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="Modify Employee Settings">
+      <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="Modify Employee Settings" size="2xl">
         {activeStf && (
           <form onSubmit={handleEditSubmit} className="space-y-4 flex flex-col h-full">
             <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -1212,7 +1509,9 @@ export function ClinicStaffPage() {
                   { value: 'Dentist', label: 'Dentist (DDS/DMD)' },
                   { value: 'Hygienist', label: 'Hygienist (RDH)' },
                   { value: 'Assistant', label: 'Dental Assistant' },
-                  { value: 'Front Desk', label: 'Receptionist' }
+                  { value: 'Front Desk', label: 'Front Desk' },
+                  { value: 'Billing Staff', label: 'Billing Staff' },
+                  { value: 'Lab Coordinator', label: 'Lab Coordinator' }
                 ]}
               />
               <Input label="Speciality Field" value={speciality} onChange={(e) => setSpeciality(e.target.value)} />
@@ -1221,6 +1520,7 @@ export function ClinicStaffPage() {
               <Input label="Phone Contact" value={phone} onChange={(e) => setPhone(e.target.value)} />
               <Input label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
+            <Input label="Account Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter new password to update (leave blank to keep current)" />
             <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
               <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
               <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Save Changes</Button>
@@ -1412,10 +1712,19 @@ export function ClinicAIPage() {
   );
 }
 
-// 8. SCOPED CLINIC SETTINGS PAGE
 export function ClinicSettingsPage() {
   const { settings, updateClinicSettings } = useClinicOwnerStore();
   const toast = useToast();
+
+  const currentUser = useAuthStore((state) => state.user);
+  const users = useSuperAdminStore((state) => state.users);
+  const updateUser = useSuperAdminStore((state) => state.updateUser);
+
+  const matchedUser = useMemo(() => {
+    if (!currentUser) return null;
+    return users.find((u) => u.id === currentUser.id) ||
+           users.find((u) => u.email?.toLowerCase() === currentUser.email?.toLowerCase());
+  }, [users, currentUser]);
 
   const [name, setName] = useState(settings.name);
   const [address, setAddress] = useState(settings.address);
@@ -1424,10 +1733,43 @@ export function ClinicSettingsPage() {
   const [website, setWebsite] = useState(settings.website);
   const [hours, setHours] = useState(settings.hours);
 
+  const [ownerName, setOwnerName] = useState('');
+  const [ownerEmail, setOwnerEmail] = useState('');
+  const [ownerPassword, setOwnerPassword] = useState('');
+
+  useEffect(() => {
+    if (matchedUser) {
+      setOwnerName(matchedUser.name || '');
+      setOwnerEmail(matchedUser.email || '');
+      setOwnerPassword(matchedUser.password || '');
+    }
+  }, [matchedUser]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Update Clinic settings
     updateClinicSettings({ name, address, phone, email, website, hours });
-    toast.success('Local clinic settings updated successfully.');
+    
+    // Update Owner details
+    if (matchedUser) {
+      updateUser(matchedUser.id, {
+        name: ownerName,
+        email: ownerEmail,
+        password: ownerPassword
+      });
+
+      // Sync with active Auth session and local storage
+      const updatedProfile = {
+        ...currentUser,
+        name: ownerName,
+        email: ownerEmail
+      };
+      localStorage.setItem('hms_auth_session', JSON.stringify(updatedProfile));
+      useAuthStore.setState({ user: updatedProfile });
+    }
+
+    toast.success('Clinic settings and owner account updated successfully.');
   };
 
   return (
@@ -1437,21 +1779,94 @@ export function ClinicSettingsPage() {
           <Settings className="h-6 w-6 text-primary" />
           Clinic General Settings
         </h2>
-        <p className="text-xs text-muted-foreground font-semibold">Configure local workspace descriptors, contact numbers, and hour logs.</p>
+        <p className="text-xs text-muted-foreground font-semibold">Configure local workspace descriptors, contact numbers, and owner logs.</p>
       </div>
 
       <div className="bg-card border border-border p-6 rounded-2xl shadow-sm max-w-2xl text-left">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input label="Practice / Clinic Name" value={name} onChange={(e) => setName(e.target.value)} required />
-          <Input label="Office Location Address" value={address} onChange={(e) => setAddress(e.target.value)} required />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input label="Phone Contact" value={phone} onChange={(e) => setPhone(e.target.value)} required />
-            <Input label="Public Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <div className="border-b border-border pb-2 mb-3">
+            <span className="text-[10px] uppercase font-bold text-primary tracking-wider">1. Practice & Location</span>
           </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input label="Official Website" value={website} onChange={(e) => setWebsite(e.target.value)} />
-            <Input label="Operation Hours" value={hours} onChange={(e) => setHours(e.target.value)} required />
+            <Input
+              label="Clinic Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              placeholder="e.g. Apex Dental Center"
+            />
+            <Input
+              label="Clinic Address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              required
+              placeholder="e.g. Dallas, TX"
+            />
           </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Phone Contact"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+              placeholder="e.g. (214) 555-0182"
+            />
+            <Input
+              label="Public Email Address"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Official Website"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+            />
+            <Input
+              label="Operation Hours"
+              value={hours}
+              onChange={(e) => setHours(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="border-b border-border pb-2 pt-2 mb-3">
+            <span className="text-[10px] uppercase font-bold text-primary tracking-wider">2. Clinic Owner Account</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Owner Full Name"
+              value={ownerName}
+              onChange={(e) => setOwnerName(e.target.value)}
+              required
+              placeholder="e.g. Dr. Arthur Miller"
+            />
+            <Input
+              label="Email Address"
+              type="email"
+              value={ownerEmail}
+              onChange={(e) => setOwnerEmail(e.target.value)}
+              required
+              placeholder="e.g. owner@apexdental.com"
+            />
+          </div>
+
+          <Input
+            label="Owner Password"
+            type="password"
+            value={ownerPassword}
+            onChange={(e) => setOwnerPassword(e.target.value)}
+            required
+            placeholder="Change login password"
+          />
+
           <div className="flex justify-end pt-4 border-t border-border">
             <Button type="submit">Save Settings</Button>
           </div>

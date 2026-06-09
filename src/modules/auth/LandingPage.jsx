@@ -99,7 +99,7 @@ export function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300 overflow-x-hidden select-none font-sans relative">
-      
+
       {/* Decorative blurred background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-200px] left-1/4 w-[700px] h-[700px] bg-primary/15 rounded-full blur-3xl animate-pulse duration-10000" />
@@ -147,7 +147,7 @@ export function LandingPage() {
             >
               Sign In
             </Button>
-            
+
             <Button
               onClick={() => navigate('/register')}
               className="font-bold text-xs h-9 px-4 gap-1 rounded-xl cursor-pointer"
@@ -315,7 +315,7 @@ export function LandingPage() {
                   <div className="grid grid-cols-6 gap-1.5 pt-1 text-[8px] font-bold text-center">
                     <span />
                     {heatmapDays.map((d) => <span key={d} className="text-muted-foreground">{d}</span>)}
-                    
+
                     {heatmapHours.map((hr, idx) => (
                       <>
                         <span key={hr} className="text-muted-foreground">{hr}</span>
@@ -324,13 +324,12 @@ export function LandingPage() {
                           return (
                             <span
                               key={`${hr}-${d}`}
-                              className={`aspect-square rounded-md border border-border/40 ${
-                                intensity === 2
+                              className={`aspect-square rounded-md border border-border/40 ${intensity === 2
                                   ? 'bg-primary'
                                   : intensity === 1
-                                  ? 'bg-primary/50'
-                                  : 'bg-primary/10'
-                              }`}
+                                    ? 'bg-primary/50'
+                                    : 'bg-primary/10'
+                                }`}
                             />
                           );
                         })}
@@ -471,9 +470,8 @@ export function LandingPage() {
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className={`bg-card/40 backdrop-blur-md border p-8 rounded-3xl shadow-sm relative flex flex-col justify-between hover:border-primary/50 hover:scale-[1.02] transition-all duration-300 ${
-                plan.name === 'Premium' ? 'border-primary ring-2 ring-primary/20 shadow-lg' : 'border-border'
-              }`}
+              className={`bg-card/40 backdrop-blur-md border p-8 rounded-3xl shadow-sm relative flex flex-col justify-between hover:border-primary/50 hover:scale-[1.02] transition-all duration-300 ${plan.name === 'Premium' ? 'border-primary ring-2 ring-primary/20 shadow-lg' : 'border-border'
+                }`}
             >
               {plan.name === 'Premium' && (
                 <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-[8px] font-black uppercase tracking-widest">
@@ -484,9 +482,8 @@ export function LandingPage() {
               <div className="space-y-4">
                 <div>
                   <h3 className="text-base font-extrabold text-foreground">{plan.name}</h3>
-                  <span className={`text-[9px] font-bold inline-block px-2.5 py-0.5 rounded-full mt-1.5 uppercase ${
-                    plan.status === 'Active' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-muted text-muted-foreground'
-                  }`}>
+                  <span className={`text-[9px] font-bold inline-block px-2.5 py-0.5 rounded-full mt-1.5 uppercase ${plan.status === 'Active' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-muted text-muted-foreground'
+                    }`}>
                     {plan.status} CONFIG
                   </span>
                 </div>
