@@ -34,6 +34,9 @@ import { Button } from '../../../shared/ui/Button';
 import { Input } from '../../../shared/ui/Input';
 import { Select } from '../../../shared/ui/Select';
 import { Badge } from '../../../shared/ui/Badge';
+import { AIInsightsPanel } from '../../../shared/ui/AIInsightsPanel';
+import { BackupStatusCard } from '../../../shared/ui/BackupStatusCard';
+import { DemoFlowButton } from '../../../shared/ui/DemoFlowButton';
 
 export function SuperAdminDashboardPage() {
   const selectedClinicId = useClinicStore((state) => state.selectedClinicId);
@@ -181,10 +184,13 @@ export function SuperAdminDashboardPage() {
               : `Active filter location: ${activeClinic?.name}`}
           </p>
         </div>
-        <Button onClick={() => setIsAddClinicOpen(true)} className="gap-2 select-none cursor-pointer">
-          <Plus className="h-4 w-4" />
-          Add Clinic Location
-        </Button>
+        <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full sm:w-auto">
+          <DemoFlowButton />
+          <Button onClick={() => setIsAddClinicOpen(true)} className="gap-2 select-none cursor-pointer w-full sm:w-auto h-11 sm:h-10 text-xs font-bold whitespace-nowrap">
+            <Plus className="h-4 w-4" />
+            Add Clinic Location
+          </Button>
+        </div>
       </div>
 
       {/* KPI Cards Grid */}

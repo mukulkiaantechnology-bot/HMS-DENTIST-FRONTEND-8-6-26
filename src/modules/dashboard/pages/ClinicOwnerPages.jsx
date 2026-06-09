@@ -151,13 +151,13 @@ export function ClinicPatientsPage() {
 
       {/* Add Modal */}
       <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Register Patient Profile">
-        <form onSubmit={handleAddSubmit} className="space-y-4 flex flex-col h-full">
-          <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. John Doe" />
+        <form onSubmit={handleAddSubmit} className="space-y-4 flex flex-col h-full animate-fade-in">
+          <Input label="FULL NAME" value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. John Doe" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input label="Age" type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="e.g. 30" />
-            <Input label="Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="e.g. (206) 555-1122" />
+            <Input label="AGE" type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="e.g. 30" />
+            <Input label="PHONE NUMBER" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="e.g. (206) 555-1122" />
           </div>
-          <Input label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="e.g. john@gmail.com" />
+          <Input label="EMAIL ADDRESS" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="e.g. john@gmail.com" />
           <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
             <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
             <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Register Patient</Button>
@@ -167,13 +167,13 @@ export function ClinicPatientsPage() {
 
       {/* Edit Modal */}
       <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="Modify Patient Profile">
-        <form onSubmit={handleEditSubmit} className="space-y-4 flex flex-col h-full">
-          <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />
+        <form onSubmit={handleEditSubmit} className="space-y-4 flex flex-col h-full animate-fade-in">
+          <Input label="FULL NAME" value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. John Doe" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input label="Age" type="number" value={age} onChange={(e) => setAge(e.target.value)} />
-            <Input label="Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <Input label="AGE" type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="e.g. 30" />
+            <Input label="PHONE NUMBER" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="e.g. (206) 555-1122" />
           </div>
-          <Input label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Input label="EMAIL ADDRESS" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="e.g. john@gmail.com" />
           <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 border-t border-border mt-auto">
             <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Cancel</Button>
             <Button type="submit" className="w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">Save Changes</Button>
@@ -200,11 +200,26 @@ export function ClinicAppointmentsPage() {
   const [treatment, setTreatment] = useState('Teeth Cleaning');
   const [status, setStatus] = useState('Confirmed');
 
+  // Calendar states
+  const [viewMode, setViewMode] = useState('calendar'); // 'list' | 'calendar'
+  const [selectedDate, setSelectedDate] = useState('2026-06-08');
+  const [selectedDentist, setSelectedDentist] = useState('all');
+
   const handleOpenAdd = () => {
     setPatientName(patients[0]?.name || '');
     setDentistName(staff.find((s) => s.role === 'Dentist')?.name || '');
     setTime('09:00 AM');
-    setDate(new Date().toISOString().split('T')[0]);
+    setDate('2026-06-08');
+    setTreatment('Teeth Cleaning');
+    setIsAddOpen(true);
+  };
+
+  const handleOpenAddForSlot = (slotLabel) => {
+    setPatientName(patients[0]?.name || '');
+    const defaultDentist = selectedDentist !== 'all' ? selectedDentist : (staff.find((s) => s.role === 'Dentist')?.name || '');
+    setDentistName(defaultDentist);
+    setTime(slotLabel);
+    setDate(selectedDate);
     setTreatment('Teeth Cleaning');
     setIsAddOpen(true);
   };
@@ -266,8 +281,42 @@ export function ClinicAppointmentsPage() {
     }
   ];
 
+  // Calendar hourly slots
+  const hourlySlots = [
+    { label: '08:00 AM', hour: 8 },
+    { label: '09:00 AM', hour: 9 },
+    { label: '10:00 AM', hour: 10 },
+    { label: '11:00 AM', hour: 11 },
+    { label: '12:00 PM', hour: 12 },
+    { label: '01:00 PM', hour: 13 },
+    { label: '02:00 PM', hour: 14 },
+    { label: '03:00 PM', hour: 15 },
+    { label: '04:00 PM', hour: 16 },
+    { label: '05:00 PM', hour: 17 }
+  ];
+
+  const getAppointmentHour = (timeStr) => {
+    if (!timeStr) return null;
+    const parts = timeStr.split(':');
+    if (parts.length < 2) return null;
+    let hr = parseInt(parts[0], 10);
+    const isPM = timeStr.toLowerCase().includes('pm');
+    if (isPM && hr < 12) hr += 12;
+    if (!isPM && hr === 12) hr = 0;
+    return hr;
+  };
+
+  const filteredAppointmentsForCalendar = useMemo(() => {
+    return appointments.filter((a) => {
+      const matchesDate = a.date === selectedDate;
+      const matchesDentist = selectedDentist === 'all' || a.dentistName.toLowerCase().includes(selectedDentist.toLowerCase());
+      return matchesDate && matchesDentist;
+    });
+  }, [appointments, selectedDate, selectedDentist]);
+
   return (
     <div className="space-y-6 text-left">
+      {/* View Mode Toggle & Actions Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-4">
         <div>
           <h2 className="text-lg md:text-xl lg:text-2xl font-extrabold flex items-center gap-2 text-foreground">
@@ -276,37 +325,194 @@ export function ClinicAppointmentsPage() {
           </h2>
           <p className="text-[11px] md:text-xs text-muted-foreground font-semibold">Coordinate patient dental schedules and staff clinician calendar slots.</p>
         </div>
-        <Button onClick={handleOpenAdd} className="gap-1.5 w-full sm:w-auto h-12 sm:h-10 text-xs font-bold">
-          <Plus className="h-4 w-4" />
-          Book Appointment
-        </Button>
+        
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          {/* Toggle buttons */}
+          <div className="flex bg-muted p-1 rounded-xl border border-border text-xs font-bold w-full sm:w-auto justify-center">
+            <button
+              onClick={() => setViewMode('calendar')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                viewMode === 'calendar' ? 'bg-background text-foreground shadow-xs' : 'text-muted-foreground'
+              }`}
+            >
+              Calendar View
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                viewMode === 'list' ? 'bg-background text-foreground shadow-xs' : 'text-muted-foreground'
+              }`}
+            >
+              List View
+            </button>
+          </div>
+          
+          <Button onClick={handleOpenAdd} className="gap-1.5 w-full sm:w-auto h-12 sm:h-10 text-xs font-bold whitespace-nowrap">
+            <Plus className="h-4 w-4" />
+            Book Appointment
+          </Button>
+        </div>
       </div>
 
-      <div className="bg-card p-4 md:p-5 border border-border rounded-xl shadow-sm">
-        <DataTable columns={columns} data={appointments} searchKey="patientName" searchPlaceholder="Search by patient name..." pageSize={10} />
-      </div>
+      {viewMode === 'calendar' && (
+        <div className="bg-card border border-border p-4 rounded-xl flex flex-col md:flex-row gap-4 items-end justify-between shadow-xs">
+          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto flex-1">
+            {/* Date Picker */}
+            <div className="flex-1 min-w-[150px] text-left">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider block mb-1">Calendar Date</label>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="w-full text-xs font-bold bg-muted border border-border rounded-lg p-2.5 focus:outline-none cursor-pointer text-foreground"
+              />
+            </div>
+            
+            {/* Dentist Filter */}
+            <div className="flex-1 min-w-[150px] text-left">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider block mb-1">Filter Dentist</label>
+              <select
+                value={selectedDentist}
+                onChange={(e) => setSelectedDentist(e.target.value)}
+                className="w-full text-xs font-bold bg-muted border border-border rounded-lg p-2.5 focus:outline-none cursor-pointer text-foreground"
+              >
+                <option value="all">All Dentists</option>
+                {staff.filter((s) => s.role === 'Dentist').map((s) => (
+                  <option key={s.id} value={s.name}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Quick navigation arrows */}
+          <div className="flex gap-2 w-full md:w-auto justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const prev = new Date(selectedDate);
+                prev.setDate(prev.getDate() - 1);
+                setSelectedDate(prev.toISOString().split('T')[0]);
+              }}
+              className="text-xs font-bold h-10 px-3 cursor-pointer"
+            >
+              &larr; Prev Day
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const next = new Date(selectedDate);
+                next.setDate(next.getDate() + 1);
+                setSelectedDate(next.toISOString().split('T')[0]);
+              }}
+              className="text-xs font-bold h-10 px-3 cursor-pointer"
+            >
+              Next Day &rarr;
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {viewMode === 'calendar' ? (
+        <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm p-4 md:p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-border/60 pb-3 select-none">
+            <h3 className="font-extrabold text-sm text-foreground flex items-center gap-2">
+              <Clock className="h-4.5 w-4.5 text-primary animate-pulse" />
+              Daily Time-Slot Schedule ({selectedDate})
+            </h3>
+            <Badge variant="secondary" className="font-bold text-[9px] uppercase">
+              {selectedDentist === 'all' ? 'All Providers' : selectedDentist}
+            </Badge>
+          </div>
+
+          <div className="divide-y divide-border/50 max-h-[600px] overflow-y-auto pr-1">
+            {hourlySlots.map((slot) => {
+              // Find appointments matching this slot hour
+              const slotApts = filteredAppointmentsForCalendar.filter(
+                (a) => getAppointmentHour(a.time) === slot.hour
+              );
+
+              return (
+                <div key={slot.label} className="py-3.5 flex flex-col md:flex-row md:items-center gap-4 text-xs font-semibold">
+                  {/* Left Label */}
+                  <div className="md:w-24 flex-shrink-0 text-left">
+                    <span className="text-sm font-black text-primary select-none">{slot.label}</span>
+                  </div>
+
+                  {/* Right Content */}
+                  <div className="flex-1">
+                    {slotApts.length > 0 ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {slotApts.map((apt) => (
+                          <div
+                            key={apt.id}
+                            onClick={() => handleOpenEdit(apt)}
+                            className="p-3.5 bg-primary/5 hover:bg-primary/10 border border-primary/20 hover:border-primary/30 rounded-xl flex items-center justify-between cursor-pointer transition-all duration-200 group text-left"
+                            title="Click to Reschedule or Edit"
+                          >
+                            <div className="space-y-1 overflow-hidden pr-2">
+                              <h4 className="font-extrabold text-foreground group-hover:text-primary transition-colors truncate">
+                                {apt.patientName}
+                              </h4>
+                              <p className="text-[10px] text-muted-foreground font-semibold truncate">
+                                {apt.treatment}
+                              </p>
+                              <span className="text-[9px] bg-card border border-border px-1.5 py-0.5 rounded text-muted-foreground font-bold truncate block w-fit mt-1">
+                                {apt.dentistName.split(' ')[0]} {apt.dentistName.split(' ')[1] || ''}
+                              </span>
+                            </div>
+                            <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                              <span className="text-[9px] font-bold text-muted-foreground">{apt.time}</span>
+                              <StatusBadge status={apt.status} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() => handleOpenAddForSlot(slot.label)}
+                        className="py-2.5 px-4 border border-dashed border-border/80 hover:border-primary/40 rounded-xl flex items-center justify-between text-muted-foreground hover:text-foreground hover:bg-muted/10 transition-all cursor-pointer select-none"
+                      >
+                        <span className="text-[10px] font-bold italic">Available Slot - click to book</span>
+                        <div className="p-1 bg-muted hover:bg-primary hover:text-white rounded-lg transition-colors">
+                          <Plus className="h-3.5 w-3.5" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        <div className="bg-card p-4 md:p-5 border border-border rounded-xl shadow-sm">
+          <DataTable columns={columns} data={appointments} searchKey="patientName" searchPlaceholder="Search by patient name..." pageSize={10} />
+        </div>
+      )}
 
       {/* Book Appointment Modal */}
       <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Schedule New Dental Appointment">
-        <form onSubmit={handleAddSubmit} className="space-y-4 flex flex-col h-full">
+        <form onSubmit={handleAddSubmit} className="space-y-4 flex flex-col h-full animate-fade-in">
           <Select
-            label="Select Patient"
+            label="SELECT PATIENT"
             value={patientName}
             onChange={(e) => setPatientName(e.target.value)}
             options={patients.map((p) => ({ value: p.name, label: p.name }))}
           />
           <Select
-            label="Select Dentist"
+            label="SELECT DENTIST"
             value={dentistName}
             onChange={(e) => setDentistName(e.target.value)}
             options={staff.filter((s) => s.role === 'Dentist').map((s) => ({ value: s.name, label: s.name }))}
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input label="Appointment Date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
-            <Input label="Time Slot" value={time} onChange={(e) => setTime(e.target.value)} required placeholder="e.g. 10:00 AM" />
+            <Input label="APPOINTMENT DATE" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+            <Input label="TIME SLOT" value={time} onChange={(e) => setTime(e.target.value)} required placeholder="e.g. 10:00 AM" />
           </div>
           <Select
-            label="Treatment Plan"
+            label="TREATMENT PLAN"
             value={treatment}
             onChange={(e) => setTreatment(e.target.value)}
             options={[
@@ -326,26 +532,26 @@ export function ClinicAppointmentsPage() {
       {/* Edit Appointment Modal */}
       <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="Reschedule Appointment Settings">
         {activeApt && (
-          <form onSubmit={handleEditSubmit} className="space-y-4 flex flex-col h-full">
+          <form onSubmit={handleEditSubmit} className="space-y-4 flex flex-col h-full animate-fade-in">
             <Select
-              label="Select Patient"
+              label="SELECT PATIENT"
               value={patientName}
               onChange={(e) => setPatientName(e.target.value)}
               options={patients.map((p) => ({ value: p.name, label: p.name }))}
               disabled
             />
             <Select
-              label="Select Dentist"
+              label="SELECT DENTIST"
               value={dentistName}
               onChange={(e) => setDentistName(e.target.value)}
               options={staff.filter((s) => s.role === 'Dentist').map((s) => ({ value: s.name, label: s.name }))}
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input label="Appointment Date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
-              <Input label="Time Slot" value={time} onChange={(e) => setTime(e.target.value)} required />
+              <Input label="APPOINTMENT DATE" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+              <Input label="TIME SLOT" value={time} onChange={(e) => setTime(e.target.value)} required placeholder="e.g. 10:00 AM" />
             </div>
             <Select
-              label="Treatment Plan"
+              label="TREATMENT PLAN"
               value={treatment}
               onChange={(e) => setTreatment(e.target.value)}
               options={[
@@ -356,7 +562,7 @@ export function ClinicAppointmentsPage() {
               ]}
             />
             <Select
-              label="Appointment Status"
+              label="APPOINTMENT STATUS"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
               options={[

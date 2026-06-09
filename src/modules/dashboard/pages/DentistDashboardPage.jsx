@@ -25,14 +25,15 @@ import { useDentistStore } from '../../../store/dentistStore';
 import { useClinicOwnerStore } from '../../../store/clinicOwnerStore';
 import { Badge } from '../../../shared/ui/Badge';
 import { Button } from '../../../shared/ui/Button';
+import { AIInsightsPanel } from '../../../shared/ui/AIInsightsPanel';
 
 export function DentistDashboardPage() {
   const navigate = useNavigate();
   const { patients, activePatientId, setActivePatientId, xrays, notes } = useDentistStore();
   const { appointments } = useClinicOwnerStore();
-
+  
   const activePatient = patients.find((p) => p.id === activePatientId);
-
+  
   const handleStartTreatment = (patientName) => {
     const pat = patients.find((p) => p.name.toLowerCase() === patientName.toLowerCase());
     if (pat) {
@@ -42,7 +43,7 @@ export function DentistDashboardPage() {
       navigate('/dentist/patients');
     }
   };
-
+  
   // Scoped Dentist KPIs (Tailored specifically for Dr. Michael Chen)
   const dentistNameFilter = 'Dr. Michael Chen';
   
@@ -50,23 +51,23 @@ export function DentistDashboardPage() {
   const doctorApts = useMemo(() => {
     return appointments.filter((a) => a.dentistName.includes(dentistNameFilter));
   }, [appointments]);
-
+  
   const todayDate = '2026-06-08';
   const todayApts = useMemo(() => {
     return doctorApts.filter((a) => a.date === todayDate);
   }, [doctorApts]);
-
+  
   // 2. Patient totals under care
   const patientsCount = patients.length;
-
+  
   // 3. Completed clinical chart notes
   const notesCount = Object.keys(notes).length;
-
+  
   // 4. Scanned radiographs total count
   const xraysCount = useMemo(() => {
     return Object.values(xrays).reduce((sum, list) => sum + list.length, 0);
   }, [xrays]);
-
+  
   // Mock Workload trends
   const workloadData = [
     { name: 'Mon', Patients: 5 },
@@ -75,7 +76,7 @@ export function DentistDashboardPage() {
     { name: 'Thu', Patients: 9 },
     { name: 'Fri', Patients: todayApts.length + 4 || 6 }
   ];
-
+  
   // Procedure categories split
   const proceduresData = [
     { name: 'Cleanings', Count: 14 },
@@ -83,7 +84,7 @@ export function DentistDashboardPage() {
     { name: 'Root Canals', Count: 8 },
     { name: 'Crowns', Count: 11 }
   ];
-
+  
   return (
     <div className="space-y-6 text-left animate-fade-in">
       {/* Title */}
@@ -95,7 +96,7 @@ export function DentistDashboardPage() {
           Review daily schedules, clinical workloads, and active EHR patient charts.
         </p>
       </div>
-
+  
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-card border border-border p-5 rounded-2xl shadow-sm hover:scale-[1.01] transition-transform duration-200 flex items-center justify-between">
@@ -107,7 +108,7 @@ export function DentistDashboardPage() {
             <Users className="h-6 w-6" />
           </div>
         </div>
-
+  
         <div className="bg-card border border-border p-5 rounded-2xl shadow-sm hover:scale-[1.01] transition-transform duration-200 flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">Appointments Today</span>
@@ -117,7 +118,7 @@ export function DentistDashboardPage() {
             <Calendar className="h-6 w-6" />
           </div>
         </div>
-
+  
         <div className="bg-card border border-border p-5 rounded-2xl shadow-sm hover:scale-[1.01] transition-transform duration-200 flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">Clinical EHR Notes</span>
@@ -127,7 +128,7 @@ export function DentistDashboardPage() {
             <UserCheck className="h-6 w-6" />
           </div>
         </div>
-
+  
         <div className="bg-card border border-border p-5 rounded-2xl shadow-sm hover:scale-[1.01] transition-transform duration-200 flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">Radiographs Scanned</span>
@@ -138,7 +139,7 @@ export function DentistDashboardPage() {
           </div>
         </div>
       </div>
-
+  
       {/* Main Layout Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left/Middle Workload and Schedules */}
@@ -168,7 +169,7 @@ export function DentistDashboardPage() {
                 </ResponsiveContainer>
               </div>
             </div>
-
+  
             <div className="bg-card border border-border p-5 rounded-2xl shadow-sm space-y-4">
               <h3 className="font-bold text-xs uppercase text-muted-foreground tracking-wider flex items-center gap-1.5">
                 <Activity className="h-4 w-4 text-indigo-400" />
@@ -187,7 +188,7 @@ export function DentistDashboardPage() {
               </div>
             </div>
           </div>
-
+  
           {/* Today's schedule filtered list */}
           <div className="bg-card border border-border p-5 rounded-2xl shadow-sm space-y-4">
             <h3 className="font-bold text-xs uppercase text-muted-foreground tracking-wider flex items-center gap-1.5">
@@ -233,9 +234,10 @@ export function DentistDashboardPage() {
             </div>
           </div>
         </div>
-
+  
         {/* Right Scoped Context Sidebar */}
         <div className="space-y-6">
+          <AIInsightsPanel />
           {/* Active Patient Detail overview context switcher card */}
           <div className="bg-card border border-border p-5 rounded-2xl shadow-sm text-left flex flex-col justify-between h-full space-y-4">
             <div className="space-y-4 flex-1">

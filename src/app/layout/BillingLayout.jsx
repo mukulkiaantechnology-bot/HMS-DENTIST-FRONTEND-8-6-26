@@ -5,6 +5,7 @@ import { useAuthStore } from '../../store/authStore';
 import { BillingSidebar } from './BillingSidebar';
 import { ToastContainer } from '../../shared/ui/Toast';
 import { Button } from '../../shared/ui/Button';
+import { SystemStatusBar } from '../../shared/ui/SystemStatusBar';
 
 export function BillingLayout({ children }) {
   const navigate = useNavigate();
@@ -38,11 +39,13 @@ export function BillingLayout({ children }) {
   if (!user) return null;
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground select-none">
-      {/* Sidebar */}
-      <BillingSidebar 
-        isMobileOpen={isMobileSidebarOpen}
-        onClose={() => setIsMobileSidebarOpen(false)}
+    <div className="flex flex-col h-screen w-screen overflow-hidden">
+      <SystemStatusBar />
+      <div className="flex-1 flex overflow-hidden bg-background text-foreground select-none">
+        {/* Sidebar */}
+        <BillingSidebar 
+          isMobileOpen={isMobileSidebarOpen}
+          onClose={() => setIsMobileSidebarOpen(false)}
       />
 
       {/* Main Panel */}
@@ -118,10 +121,11 @@ export function BillingLayout({ children }) {
           </div>
         </main>
       </div>
-
-      {/* Toast Alert Popups */}
-      <ToastContainer />
     </div>
-  );
+
+    {/* Toast Alert Popups */}
+    <ToastContainer />
+  </div>
+);
 }
 export default BillingLayout;

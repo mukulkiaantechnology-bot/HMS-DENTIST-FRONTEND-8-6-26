@@ -2,7 +2,7 @@ export const MODULE_ROUTES = [
   // Super Admin Control Panel Modules (Exactly 7 Modules)
   { module: 'super_admin_dashboard', path: '/super-admin/dashboard', label: 'Dashboard (Global)', icon: 'LayoutDashboard' },
   { module: 'super_admin_clinics', path: '/super-admin/clinics', label: 'Clinics Management', icon: 'Building2' },
-  { module: 'super_admin_users', path: '/super-admin/users', label: 'User Management', icon: 'UserCog' },
+  { module: 'super_admin_users', path: '/super-admin/users', label: 'Clinic Owner', icon: 'UserCog' },
   { module: 'super_admin_subscriptions', path: '/super-admin/subscriptions', label: 'Subscriptions', icon: 'Receipt' },
   { module: 'super_admin_billing', path: '/super-admin/billing', label: 'Billing', icon: 'Coins' },
   { module: 'super_admin_ai', path: '/super-admin/ai', label: 'AI Settings', icon: 'Sliders' },

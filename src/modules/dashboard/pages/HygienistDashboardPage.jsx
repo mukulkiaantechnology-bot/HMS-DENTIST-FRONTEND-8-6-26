@@ -23,6 +23,7 @@ import {
 import { useHygienistStore } from '../../../store/hygienistStore';
 import { Badge } from '../../../shared/ui/Badge';
 import { Button } from '../../../shared/ui/Button';
+import { AIInsightsPanel } from '../../../shared/ui/AIInsightsPanel';
 
 export function HygienistDashboardPage() {
   const navigate = useNavigate();
@@ -156,11 +157,13 @@ export function HygienistDashboardPage() {
         </div>
       </div>
 
+      <AIInsightsPanel />
+
       {/* Main Grid: Today's Schedule & Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Today's Schedule (2 columns on lg) */}
-        <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-5 shadow-sm flex flex-col space-y-4">
+        {/* Today's Schedule (expanded to full grid width on wide screens) */}
+        <div className="lg:col-span-3 bg-card border border-border rounded-2xl p-5 shadow-sm flex flex-col space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-extrabold text-sm text-foreground flex items-center gap-2">
               <Activity className="h-4.5 w-4.5 text-primary animate-pulse" />
@@ -269,61 +272,6 @@ export function HygienistDashboardPage() {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-        </div>
-
-        {/* AI Gum Health Insights Panel */}
-        <div className="bg-card border border-border rounded-2xl p-5 shadow-sm flex flex-col space-y-4">
-          <h3 className="font-extrabold text-sm text-foreground flex items-center gap-2">
-            <Brain className="h-4.5 w-4.5 text-primary animate-bounce" />
-            AI preventive Insights
-          </h3>
-
-          <div className="space-y-3 flex-1 overflow-y-auto no-scrollbar">
-            {/* Warning 1 */}
-            <div className="p-3 bg-rose-500/5 dark:bg-rose-500/10 border border-rose-500/10 rounded-xl text-left space-y-1.5">
-              <div className="flex items-center gap-1.5 text-rose-500 font-bold text-xs">
-                <AlertTriangle className="h-3.5 w-3.5" />
-                Severe Periodontitis Alert
-              </div>
-              <p className="text-[11px] text-muted-foreground font-semibold leading-relaxed">
-                <strong>Mary Watson</strong> has 5 active sites with pocket depth &gt; 5mm (max 7mm on #19) and severe bleeding. Recommended: urgent root plane SRP therapy.
-              </p>
-              <button
-                onClick={() => handleStartSession('pat-2', 'perio')}
-                className="text-[10px] text-rose-500 hover:underline font-bold"
-              >
-                Inspect Perio Chart &rarr;
-              </button>
-            </div>
-
-            {/* Warning 2 */}
-            <div className="p-3 bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/10 rounded-xl text-left space-y-1.5">
-              <div className="flex items-center gap-1.5 text-amber-500 font-bold text-xs">
-                <Clock className="h-3.5 w-3.5" />
-                Overdue Recall Trigger
-              </div>
-              <p className="text-[11px] text-muted-foreground font-semibold leading-relaxed">
-                <strong>David Miller</strong> is overdue for a cleaning since May 2026. Patient has history of calculus build-up and is a former smoker.
-              </p>
-              <button
-                onClick={() => handleStartSession('pat-4', 'recall')}
-                className="text-[10px] text-amber-500 hover:underline font-bold"
-              >
-                Trigger Recall SMS &rarr;
-              </button>
-            </div>
-
-            {/* Suggestion 3 */}
-            <div className="p-3 bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/10 rounded-xl text-left space-y-1.5">
-              <div className="flex items-center gap-1.5 text-emerald-500 font-bold text-xs">
-                <Sparkles className="h-3.5 w-3.5" />
-                Prophy Success
-              </div>
-              <p className="text-[11px] text-muted-foreground font-semibold leading-relaxed">
-                <strong>Alex Johnson</strong> has excellent compliance. All pockets &le; 3mm. Schedule standard 6-month prophy recall.
-              </p>
             </div>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { useHygienistStore } from '../../store/hygienistStore';
 import { HygienistSidebar } from './HygienistSidebar';
 import { ToastContainer } from '../../shared/ui/Toast';
 import { Button } from '../../shared/ui/Button';
+import { SystemStatusBar } from '../../shared/ui/SystemStatusBar';
 
 export function HygienistLayout({ children }) {
   const navigate = useNavigate();
@@ -54,7 +55,9 @@ export function HygienistLayout({ children }) {
   const activePatient = patients.find((p) => p.id === activePatientId);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground select-none">
+    <div className="flex flex-col h-screen w-screen overflow-hidden">
+      <SystemStatusBar />
+      <div className="flex-1 flex overflow-hidden bg-background text-foreground select-none">
       {/* Hygienist Sidebar */}
       <HygienistSidebar 
         isMobileOpen={isMobileSidebarOpen} 
@@ -158,6 +161,8 @@ export function HygienistLayout({ children }) {
             {children || <Outlet />}
           </div>
         </main>
+      </div>
+
       </div>
 
       {/* Toast Alert Popups */}

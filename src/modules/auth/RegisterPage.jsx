@@ -86,7 +86,7 @@ export function RegisterPage() {
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-indigo-500/20 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative w-full max-w-lg bg-card border border-border p-8 rounded-2xl shadow-xl z-10 animate-fade-in text-center">
+      <div className="relative w-full max-w-lg bg-card border border-border p-6 sm:p-8 rounded-2xl shadow-xl z-10 animate-fade-in text-center">
         {/* Back Arrow */}
         <button
           onClick={() => navigate('/')}
@@ -97,7 +97,7 @@ export function RegisterPage() {
         </button>
 
         {/* Brand */}
-        <div className="flex justify-center mb-6 mt-4">
+        <div className="flex justify-center mb-6 mt-8 sm:mt-4">
           <div className="bg-primary text-primary-foreground p-3 rounded-2xl shadow-md">
             <Activity className="h-7 w-7" />
           </div>
@@ -111,11 +111,11 @@ export function RegisterPage() {
             </p>
 
             {/* Registration Type Toggles */}
-            <div className="flex bg-muted p-1 rounded-xl mt-6 mb-6">
+            <div className="flex flex-col sm:flex-row bg-muted p-1 rounded-xl mt-6 mb-6 gap-1">
               <button
                 type="button"
                 onClick={() => setRegType('clinic')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-extrabold cursor-pointer transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-extrabold cursor-pointer transition-all ${
                   regType === 'clinic'
                     ? 'bg-card text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
@@ -127,7 +127,7 @@ export function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setRegType('patient')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-extrabold cursor-pointer transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-extrabold cursor-pointer transition-all ${
                   regType === 'patient'
                     ? 'bg-card text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
@@ -272,7 +272,7 @@ export function RegisterPage() {
                     <span className="font-extrabold text-foreground block">Password: {ownerPassword}</span>
                   </p>
                   <p className="text-primary font-bold">
-                    Go to the Super Admin Dashboard &rarr; User Management to Approve this clinic owner!
+                    Go to the Super Admin Dashboard &rarr; Clinic Owner to Approve this clinic owner!
                   </p>
                 </div>
               </>

@@ -21,6 +21,7 @@ import {
 } from 'recharts';
 import { useClinicOwnerStore } from '../../../store/clinicOwnerStore';
 import { Badge } from '../../../shared/ui/Badge';
+import { AIInsightsPanel } from '../../../shared/ui/AIInsightsPanel';
 
 export function ClinicOwnerDashboardPage() {
   const { patients, staff, appointments, invoices, clinicalNotes } = useClinicOwnerStore();
@@ -157,10 +158,12 @@ export function ClinicOwnerDashboardPage() {
         </div>
       </div>
 
+      <AIInsightsPanel />
+
       {/* Timeline and AI Insights Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Appointments Timeline list */}
-        <div className="lg:col-span-2 bg-card border border-border p-5 rounded-2xl shadow-sm space-y-4 text-left">
+        <div className="lg:col-span-3 bg-card border border-border p-5 rounded-2xl shadow-sm space-y-4 text-left">
           <h3 className="font-bold text-sm text-foreground uppercase tracking-wider flex items-center gap-1.5">
             <Calendar className="h-4 w-4 text-primary" />
             Scheduler Timeline &bull; Today
@@ -187,39 +190,6 @@ export function ClinicOwnerDashboardPage() {
             ) : (
               <span className="text-muted-foreground text-xs font-semibold italic block py-4 text-center">No appointments scheduled for today</span>
             )}
-          </div>
-        </div>
-
-        {/* AI Scoped Panel */}
-        <div className="bg-card border border-border p-5 rounded-2xl shadow-sm space-y-4 text-left flex flex-col justify-between">
-          <div className="space-y-4">
-            <h3 className="font-bold text-sm text-foreground uppercase tracking-wider flex items-center gap-1.5">
-              <BrainCircuit className="h-4 w-4 text-indigo-400" />
-              Clinical AI Agent Insights
-            </h3>
-
-            <div className="space-y-3">
-              <div className="p-3 bg-indigo-500/5 border border-indigo-500/10 rounded-xl space-y-1">
-                <span className="text-[10px] font-bold text-indigo-500 uppercase block tracking-wider">Radiograph Diagnostics</span>
-                <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">
-                  2 diagnostic radiograph files audited today. Detected 1 marginal bone loss discrepancy on tooth #19. Clinical chart updated.
-                </p>
-              </div>
-
-              <div className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl space-y-1">
-                <span className="text-[10px] font-bold text-emerald-500 uppercase block tracking-wider">Recall Conversions</span>
-                <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">
-                  AI SMS agent scheduled 3 recall notifications for overdue hygiene checks. conversion score: +18% increase.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-4 border-t border-border flex items-center justify-between text-[10px] text-muted-foreground font-semibold">
-            <span className="flex items-center gap-1">
-              <FileCheck className="h-3.5 w-3.5 text-primary" />
-              Active Charts Audited: {clinicalNotes.length}
-            </span>
           </div>
         </div>
       </div>

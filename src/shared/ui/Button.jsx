@@ -15,6 +15,7 @@ export const Button = React.forwardRef(
           variant === 'destructive' && 'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm focus:ring-destructive',
           variant === 'ghost' && 'bg-transparent text-foreground hover:bg-secondary focus:ring-ring',
           // Sizes
+          size === 'xs' && 'h-7 px-2.5 text-[10px]',
           size === 'sm' && 'h-8 px-3 text-xs',
           size === 'md' && 'h-10 px-4 text-sm',
           size === 'lg' && 'h-11 px-8 text-base',

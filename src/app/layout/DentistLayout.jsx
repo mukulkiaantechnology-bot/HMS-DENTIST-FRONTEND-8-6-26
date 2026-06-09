@@ -6,6 +6,7 @@ import { useDentistStore } from '../../store/dentistStore';
 import { DentistSidebar } from './DentistSidebar';
 import { ToastContainer } from '../../shared/ui/Toast';
 import { Button } from '../../shared/ui/Button';
+import { SystemStatusBar } from '../../shared/ui/SystemStatusBar';
 
 export function DentistLayout({ children }) {
   const navigate = useNavigate();
@@ -54,7 +55,9 @@ export function DentistLayout({ children }) {
   const activePatient = patients.find((p) => p.id === activePatientId);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground select-none">
+    <div className="flex flex-col h-screen w-screen overflow-hidden">
+      <SystemStatusBar />
+      <div className="flex-1 flex overflow-hidden bg-background text-foreground select-none">
       {/* Dentist Sidebar */}
       <DentistSidebar 
         isMobileOpen={isMobileSidebarOpen} 
@@ -158,6 +161,8 @@ export function DentistLayout({ children }) {
             {children || <Outlet />}
           </div>
         </main>
+      </div>
+
       </div>
 
       {/* Toast Alert Popups */}

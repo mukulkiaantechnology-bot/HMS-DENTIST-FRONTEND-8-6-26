@@ -822,14 +822,17 @@ export function SuperAdminUsersPage() {
   // Form states
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState('clinic_owner');
   const [clinicId, setClinicId] = useState('clinic-1');
   const [password, setPassword] = useState('123');
+
+  // Filter to only display Clinic Owners
+  const clinicOwners = useMemo(() => {
+    return users.filter((u) => u.role === 'clinic_owner');
+  }, [users]);
 
   const handleOpenAdd = () => {
     setName('');
     setEmail('');
-    setRole('clinic_owner');
     setClinicId(clinics[0]?.id || 'clinic-1');
     setPassword('123');
     setIsAddOpen(true);
@@ -839,7 +842,6 @@ export function SuperAdminUsersPage() {
     setActiveUser(userItem);
     setName(userItem.name);
     setEmail(userItem.email);
-    setRole(userItem.role);
     setClinicId(userItem.clinicId);
     setPassword(userItem.password || '');
     setIsEditOpen(true);
@@ -848,40 +850,29 @@ export function SuperAdminUsersPage() {
   const handleAddSubmit = (e) => {
     e.preventDefault();
     if (!name || !email) return;
-    addUser({ name, email, role, clinicId, password, status: 'Approved' });
-    toast.success(`User "${name}" created successfully.`);
+    addUser({ name, email, role: 'clinic_owner', clinicId, password, status: 'Approved' });
+    toast.success(`Clinic Owner "${name}" created successfully.`);
     setIsAddOpen(false);
   };
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
     if (!activeUser) return;
-    updateUser(activeUser.id, { name, email, role, clinicId, password });
-    toast.success(`User settings updated for ${name}`);
+    updateUser(activeUser.id, { name, email, role: 'clinic_owner', clinicId, password });
+    toast.success(`Clinic Owner settings updated for ${name}`);
     setIsEditOpen(false);
   };
 
   const handleDelete = (id, userName) => {
-    if (confirm(`Are you sure you want to delete user "${userName}"?`)) {
+    if (confirm(`Are you sure you want to delete clinic owner "${userName}"?`)) {
       deleteUser(id);
-      toast.warning(`Deleted credential access for: ${userName}`);
+      toast.warning(`Deleted credential access for clinic owner: ${userName}`);
     }
   };
 
   const handleApprove = (id, userName) => {
     approveUser(id);
-    toast.success(`Approved login access for: ${userName}`);
-  };
-
-  // Maps role key to printable labels
-  const roleLabels = {
-    clinic_owner: 'Clinic Owner',
-    dentist: 'Dentist (DDS/DMD)',
-    hygienist: 'Hygienist (RDH)',
-    assistant: 'Assistant',
-    front_desk: 'Front Desk',
-    billing_staff: 'Billing Coordinator',
-    lab_coordinator: 'Lab Coordinator'
+    toast.success(`Approved login access for clinic owner: ${userName}`);
   };
 
   // Maps clinic Id to clinic name
@@ -895,7 +886,7 @@ export function SuperAdminUsersPage() {
   const columns = [
     { key: 'id', header: 'User ID', render: (u) => <span className="font-bold text-slate-500">#{u.id}</span> },
     { key: 'name', header: 'Name' },
-    { key: 'role', header: 'Role Type', render: (u) => <span>{roleLabels[u.role] || u.role}</span> },
+    { key: 'role', header: 'Role Type', render: () => <span className="font-semibold text-slate-500">Clinic Owner</span> },
     { key: 'email', header: 'Email' },
     { key: 'clinic', header: 'Associated Office', render: (u) => <span>{clinicNames[u.clinicId] || 'Global Office'}</span> },
     {
@@ -919,7 +910,7 @@ export function SuperAdminUsersPage() {
               size="icon"
               onClick={() => handleApprove(u.id, u.name)}
               className="h-8 w-8 rounded-full hover:bg-emerald-500/10"
-              title="Approve User"
+              title="Approve Clinic Owner"
             >
               <UserCheck className="h-4 w-4 text-emerald-500" />
             </Button>
@@ -929,7 +920,7 @@ export function SuperAdminUsersPage() {
             size="icon"
             onClick={() => handleOpenEdit(u)}
             className="h-8 w-8 rounded-full hover:bg-primary/10"
-            title="Edit User"
+            title="Edit Clinic Owner"
           >
             <Edit2 className="h-4 w-4 text-muted-foreground hover:text-primary" />
           </Button>
@@ -938,7 +929,7 @@ export function SuperAdminUsersPage() {
             size="icon"
             onClick={() => handleDelete(u.id, u.name)}
             className="h-8 w-8 rounded-full hover:bg-destructive/10"
-            title="Delete User"
+            title="Delete Clinic Owner"
           >
             <Trash2 className="h-4 w-4 text-destructive" />
           </Button>
@@ -953,40 +944,26 @@ export function SuperAdminUsersPage() {
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <UserCheck className="h-6 w-6 text-primary" />
-            Platform User Directory
+            Clinic Owner Directory
           </h2>
-          <p className="text-xs text-muted-foreground font-semibold">Manage authorization credentials and approvals for all clinic staff roles.</p>
+          <p className="text-xs text-muted-foreground font-semibold">Manage authorization credentials and approvals for all clinic owners.</p>
         </div>
         <Button onClick={handleOpenAdd} className="gap-1.5 w-full sm:w-auto justify-center">
           <Plus className="h-4 w-4" />
-          Add User
+          Add Clinic Owner
         </Button>
       </div>
 
       <div className="bg-card p-5 border border-border rounded-xl shadow-sm">
-        <DataTable columns={columns} data={users} searchKey="name" searchPlaceholder="Search users by name..." pageSize={10} />
+        <DataTable columns={columns} data={clinicOwners} searchKey="name" searchPlaceholder="Search clinic owners by name..." pageSize={10} />
       </div>
 
       {/* Add User Modal */}
-      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Add New User Credential">
+      <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Add New Clinic Owner Credential">
         <form onSubmit={handleAddSubmit} className="space-y-4">
           <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. Elena Rostova" />
           <Input label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="e.g. elena@clinic.com" />
           <Input label="Account Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Password for login" />
-          <Select
-            label="Security Role Assign"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            options={[
-              { value: 'clinic_owner', label: 'Clinic Owner' },
-              { value: 'dentist', label: 'Dentist (DDS/DMD)' },
-              { value: 'hygienist', label: 'Dental Hygienist (RDH)' },
-              { value: 'assistant', label: 'Dental Assistant' },
-              { value: 'front_desk', label: 'Front Desk Receptionist' },
-              { value: 'billing_staff', label: 'Billing Coordinator' },
-              { value: 'lab_coordinator', label: 'Lab Coordinator' }
-            ]}
-          />
           <Select
             label="Assigned Office Location"
             value={clinicId}
@@ -995,32 +972,18 @@ export function SuperAdminUsersPage() {
           />
           <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-border mt-4 w-full">
             <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} className="w-full sm:w-auto h-11 sm:h-10">Cancel</Button>
-            <Button type="submit" className="w-full sm:w-auto h-11 sm:h-10">Create User</Button>
+            <Button type="submit" className="w-full sm:w-auto h-11 sm:h-10">Create Clinic Owner</Button>
           </div>
         </form>
       </Modal>
 
       {/* Edit User Modal */}
-      <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="Modify User Permissions">
+      <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} title="Modify Clinic Owner Credentials">
         {activeUser && (
           <form onSubmit={handleEditSubmit} className="space-y-4">
             <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />
             <Input label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             <Input label="Account Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Password for login" />
-            <Select
-              label="Security Role Assign"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              options={[
-                { value: 'clinic_owner', label: 'Clinic Owner' },
-                { value: 'dentist', label: 'Dentist (DDS/DMD)' },
-                { value: 'hygienist', label: 'Dental Hygienist (RDH)' },
-                { value: 'assistant', label: 'Dental Assistant' },
-                { value: 'front_desk', label: 'Front Desk Receptionist' },
-                { value: 'billing_staff', label: 'Billing Coordinator' },
-                { value: 'lab_coordinator', label: 'Lab Coordinator' }
-              ]}
-            />
             <Select
               label="Assigned Office Location"
               value={clinicId}

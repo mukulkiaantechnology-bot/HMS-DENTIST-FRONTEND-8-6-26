@@ -7,6 +7,7 @@ import { Modal } from '../../../shared/ui/Modal';
 import { Input } from '../../../shared/ui/Input';
 import { Select } from '../../../shared/ui/Select';
 import { useToast } from '../../../shared/hooks/useToast';
+import { AIInsightsPanel } from '../../../shared/ui/AIInsightsPanel';
 
 export function LabCasesPage() {
   const { labCases, activeCaseId, setActiveCaseId, createLabCase, updateCaseStatus } = useLabStore();
@@ -148,6 +149,8 @@ export function LabCasesPage() {
           ))}
         </div>
       </div>
+
+      <AIInsightsPanel />
 
       {/* Grid / Table content */}
       {filteredCases.length === 0 ? (

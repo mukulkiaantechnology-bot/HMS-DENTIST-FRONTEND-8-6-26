@@ -436,24 +436,24 @@ export function FrontDeskRegistrationPage() {
         header: 'Actions',
         align: 'right',
         render: (p) => (
-          <div className="flex flex-col sm:flex-row gap-2 justify-end w-full">
+          <div className="flex gap-1.5 justify-end">
             <Button
-              size="xs"
-              variant="outline"
+              variant="ghost"
+              size="icon"
               onClick={() => handleOpenEdit(p)}
-              className="text-primary hover:bg-primary/10 border-primary/20 hover:border-primary/30 font-bold gap-1 cursor-pointer h-9 sm:h-7 w-full sm:w-auto justify-center"
+              className="h-8 w-8 rounded-full hover:bg-primary/10"
+              title="Edit Patient"
             >
-              <Edit2 className="h-3 w-3" />
-              Edit
+              <Edit2 className="h-4 w-4 text-muted-foreground hover:text-primary" />
             </Button>
             <Button
-              size="xs"
-              variant="outline"
+              variant="ghost"
+              size="icon"
               onClick={() => handleDelete(p.id, p.name)}
-              className="text-rose-500 hover:bg-rose-500/10 border-rose-500/20 hover:border-rose-500/30 font-bold gap-1 cursor-pointer h-9 sm:h-7 w-full sm:w-auto justify-center"
+              className="h-8 w-8 rounded-full hover:bg-destructive/10"
+              title="Delete Patient"
             >
-              <Trash2 className="h-3 w-3" />
-              Delete
+              <Trash2 className="h-4 w-4 text-destructive" />
             </Button>
           </div>
         )

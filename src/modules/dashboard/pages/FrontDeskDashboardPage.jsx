@@ -17,6 +17,7 @@ import { Badge } from '../../../shared/ui/Badge';
 import { Button } from '../../../shared/ui/Button';
 import { Input } from '../../../shared/ui/Input';
 import { useToast } from '../../../shared/hooks/useToast';
+import { AIInsightsPanel } from '../../../shared/ui/AIInsightsPanel';
 
 export function FrontDeskDashboardPage() {
   const navigate = useNavigate();
@@ -164,6 +165,8 @@ export function FrontDeskDashboardPage() {
         </div>
       </div>
 
+      <AIInsightsPanel />
+
       {/* Main Grid: Today's Appointments & Walk-ins */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
@@ -219,7 +222,7 @@ export function FrontDeskDashboardPage() {
                           </span>
                         </td>
                         <td className="py-3 text-right">
-                          <div className="flex gap-1 justify-end">
+                          <div className="flex gap-2 justify-end">
                             <Button
                               size="xs"
                               variant="primary"

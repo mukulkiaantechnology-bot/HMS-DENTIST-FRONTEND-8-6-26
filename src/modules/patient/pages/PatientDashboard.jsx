@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, CreditCard, Activity, FlaskConical, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { usePatientStore } from '../../../store/patientStore';
+import { AIInsightsPanel } from '../../../shared/ui/AIInsightsPanel';
 
 export function PatientDashboard() {
   const navigate = useNavigate();
@@ -130,6 +131,8 @@ export function PatientDashboard() {
           </div>
         </div>
       </div>
+
+      <AIInsightsPanel />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Next Appointment column */}

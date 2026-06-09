@@ -6,6 +6,7 @@ import { useLabStore } from '../../store/labStore';
 import { LabSidebar } from './LabSidebar';
 import { ToastContainer } from '../../shared/ui/Toast';
 import { Button } from '../../shared/ui/Button';
+import { SystemStatusBar } from '../../shared/ui/SystemStatusBar';
 
 export function LabCoordinatorLayout({ children }) {
   const navigate = useNavigate();
@@ -48,7 +49,9 @@ export function LabCoordinatorLayout({ children }) {
   const activeCase = labCases.find((c) => c.id === activeCaseId);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground select-none">
+    <div className="flex flex-col h-screen w-screen overflow-hidden">
+      <SystemStatusBar />
+      <div className="flex-1 flex overflow-hidden bg-background text-foreground select-none">
       {/* Sidebar */}
       <LabSidebar 
         isMobileOpen={isMobileSidebarOpen}
@@ -171,6 +174,8 @@ export function LabCoordinatorLayout({ children }) {
             {children || <Outlet />}
           </div>
         </main>
+      </div>
+
       </div>
 
       {/* Toast Alert Popups */}

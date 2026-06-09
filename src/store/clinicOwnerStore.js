@@ -1,9 +1,12 @@
 import { create } from 'zustand';
 
 const INITIAL_PATIENTS = [
-  { id: 'pat-1', name: 'James Carter', age: 45, phone: '(206) 555-1212', email: 'james@gmail.com', status: 'Active' },
-  { id: 'pat-2', name: 'Mary Watson', age: 34, phone: '(206) 555-8989', email: 'mary@gmail.com', status: 'Active' },
-  { id: 'pat-3', name: 'Alex Johnson', age: 29, phone: '(206) 555-4343', email: 'alex.j@gmail.com', status: 'Inactive' }
+  { id: 'pat-1', name: 'James Carter', age: 45, gender: 'Male', phone: '(206) 555-1212', email: 'james@gmail.com', status: 'Active', clinicId: 'clinic-1', insuranceProvider: 'MetLife Dental', allergies: ['Penicillin'], address: '123 Pine St, Seattle, WA' },
+  { id: 'pat-2', name: 'Mary Watson', age: 34, gender: 'Female', phone: '(206) 555-8989', email: 'mary@gmail.com', status: 'Active', clinicId: 'clinic-1', insuranceProvider: 'Delta Dental', allergies: ['Latex'], address: '456 Oak St, Seattle, WA' },
+  { id: 'pat-3', name: 'Alex Johnson', age: 29, gender: 'Male', phone: '(206) 555-4343', email: 'alex.j@gmail.com', status: 'Inactive', clinicId: 'clinic-1', insuranceProvider: 'Cigna', allergies: [], address: '789 Maple Ave, Bellevue, WA' },
+  { id: 'pat-4', name: 'Sarah Jenkins', age: 38, gender: 'Female', phone: '(206) 555-7788', email: 's.jenkins@hms-saas.com', status: 'Active', clinicId: 'clinic-1', insuranceProvider: 'Guardian Dental', allergies: [], address: '101 Broadway, Seattle, WA' },
+  { id: 'pat-5', name: 'Robert Chen', age: 52, gender: 'Male', phone: '(425) 555-9012', email: 'robert@chen.org', status: 'Active', clinicId: 'clinic-2', insuranceProvider: 'Aetna PPO', allergies: ['Sulfa'], address: '202 Bellevue Way, Bellevue, WA' },
+  { id: 'pat-6', name: 'Emily Davis', age: 26, gender: 'Female', phone: '(425) 555-3456', email: 'emily.d@gmail.com', status: 'Active', clinicId: 'clinic-2', insuranceProvider: 'None', allergies: [], address: '303 Red Wood Ave, Redmond, WA' }
 ];
 
 const INITIAL_STAFF = [

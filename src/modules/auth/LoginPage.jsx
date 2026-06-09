@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Activity, ArrowRight, ArrowLeft, Key } from 'lucide-react';
+import * as Icons from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { Button } from '../../shared/ui/Button';
 import { Input } from '../../shared/ui/Input';
-import { Select } from '../../shared/ui/Select';
 import { useToast } from '../../shared/hooks/useToast';
 
 export function LoginPage() {
@@ -16,37 +15,22 @@ export function LoginPage() {
   const [password, setPassword] = useState('admin123');
   const [demoProfile, setDemoProfile] = useState('super_admin');
 
-  const handleDemoSelect = (e) => {
-    const val = e.target.value;
-    setDemoProfile(val);
-    if (val === 'super_admin') {
-      setEmail('s.jenkins@hms-saas.com');
-      setPassword('admin123');
-    } else if (val === 'clinic_owner_approved') {
-      setEmail('owner@vancedental.com');
-      setPassword('password123');
-    } else if (val === 'dentist') {
-      setEmail('dr.chen@vancedental.com');
-      setPassword('password123');
-    } else if (val === 'hygienist') {
-      setEmail('elena.r@vancedental.com');
-      setPassword('password123');
-    } else if (val === 'front_desk') {
-      setEmail('amara.reception@vancedental.com');
-      setPassword('password123');
-    } else if (val === 'billing_staff') {
-      setEmail('billing@vancedental.com');
-      setPassword('password123');
-    } else if (val === 'dental_assistant') {
-      setEmail('assistant@vancedental.com');
-      setPassword('password123');
-    } else if (val === 'lab_coordinator') {
-      setEmail('lab@vancedental.com');
-      setPassword('password123');
-    } else if (val === 'patient') {
-      setEmail('james@gmail.com');
-      setPassword('password123');
-    }
+  const demoProfiles = [
+    { key: 'super_admin', label: 'Super Admin', email: 's.jenkins@hms-saas.com', password: 'admin123', icon: 'Shield', color: 'text-purple-500 bg-purple-500/10 border-purple-500/20' },
+    { key: 'clinic_owner_approved', label: 'Clinic Owner', email: 'owner@vancedental.com', password: 'password123', icon: 'Building2', color: 'text-indigo-500 bg-indigo-500/10 border-indigo-500/20' },
+    { key: 'dentist', label: 'Dentist', email: 'dr.chen@vancedental.com', password: 'password123', icon: 'UserCheck', color: 'text-rose-500 bg-rose-500/10 border-rose-500/20' },
+    { key: 'hygienist', label: 'Hygienist', email: 'elena.r@vancedental.com', password: 'password123', icon: 'Sparkles', color: 'text-amber-500 bg-amber-500/10 border-amber-500/20' },
+    { key: 'front_desk', label: 'Front Desk', email: 'amara.reception@vancedental.com', password: 'password123', icon: 'PhoneCall', color: 'text-blue-500 bg-blue-500/10 border-blue-500/20' },
+    { key: 'billing_staff', label: 'Billing Staff', email: 'billing@vancedental.com', password: 'password123', icon: 'CreditCard', color: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20' },
+    { key: 'dental_assistant', label: 'Assistant', email: 'assistant@vancedental.com', password: 'password123', icon: 'HeartPulse', color: 'text-teal-500 bg-teal-500/10 border-teal-500/20' },
+    { key: 'lab_coordinator', label: 'Lab Coord.', email: 'lab@vancedental.com', password: 'password123', icon: 'FlaskConical', color: 'text-cyan-500 bg-cyan-500/10 border-cyan-500/20' },
+    { key: 'patient', label: 'Patient', email: 'james@gmail.com', password: 'password123', icon: 'User', color: 'text-pink-500 bg-pink-500/10 border-pink-500/20' }
+  ];
+
+  const handleProfileSelect = (prof) => {
+    setDemoProfile(prof.key);
+    setEmail(prof.email);
+    setPassword(prof.password);
   };
 
   const handleLogin = (e) => {
@@ -93,57 +77,71 @@ export function LoginPage() {
     }
   };
 
-  const demoOptions = [
-    { value: 'super_admin', label: 'Global Super Admin (s.jenkins@hms-saas.com)' },
-    { value: 'clinic_owner_approved', label: 'Clinic Owner - Approved (owner@vancedental.com)' },
-
-    { value: 'dentist', label: 'Dentist - Dr. Michael Chen (dr.chen@vancedental.com)' },
-    { value: 'hygienist', label: 'Hygienist - Elena Rostova, RDH (elena.r@vancedental.com)' },
-    { value: 'front_desk', label: 'Front Desk - Amara Lopez (amara.reception@vancedental.com)' },
-    { value: 'billing_staff', label: 'Billing Staff - Samantha Billing (billing@vancedental.com)' },
-    { value: 'dental_assistant', label: 'Dental Assistant - David Miller (assistant@vancedental.com)' },
-    { value: 'lab_coordinator', label: 'Lab Coordinator - Marcus Vance (lab@vancedental.com)' },
-    { value: 'patient', label: 'Patient - James Carter (james@gmail.com)' }
-  ];
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 transition-colors duration-300 relative">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-8 transition-colors duration-300 relative">
       {/* Background gradients */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40 dark:opacity-25">
         <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-indigo-500/20 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative w-full max-w-md bg-card border border-border p-8 rounded-2xl shadow-xl z-10 animate-fade-in text-center">
+      <div className="relative w-full max-w-lg bg-card border border-border p-6 sm:p-8 rounded-2xl shadow-xl z-10 animate-fade-in text-center">
         {/* Back Arrow */}
         <button
           onClick={() => navigate('/')}
           className="absolute left-6 top-6 flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <Icons.ArrowLeft className="h-4 w-4" />
           Home
         </button>
 
         {/* Brand */}
-        <div className="flex justify-center mb-6 mt-4">
+        <div className="flex justify-center mb-6 mt-8 sm:mt-4">
           <div className="bg-primary text-primary-foreground p-3 rounded-2xl shadow-md">
-            <Activity className="h-7 w-7" />
+            <Icons.Activity className="h-7 w-7" />
           </div>
         </div>
 
         <h1 className="text-2xl font-bold tracking-tight text-foreground">HMS CoreSaaS</h1>
-        <p className="text-sm text-muted-foreground mt-2 font-semibold">
+        <p className="text-xs text-muted-foreground mt-2 font-semibold">
           Multi-Clinic Hospital Management Platform
         </p>
 
         <form onSubmit={handleLogin} className="mt-8 space-y-5 text-left">
-          {/* Quick Sandbox Profiles Selector */}
-          <Select
-            label="Sandbox Quick-Select Profiles"
-            value={demoProfile}
-            onChange={handleDemoSelect}
-            options={demoOptions}
-          />
+          {/* Grid Selector */}
+          <div className="space-y-2.5">
+            <label className="text-[10px] uppercase text-muted-foreground font-black tracking-wider block">
+              Sandbox Quick-Select Profiles
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {demoProfiles.map((prof) => {
+                const Icon = Icons[prof.icon] || Icons.Shield;
+                const isSelected = demoProfile === prof.key;
+                return (
+                  <button
+                    key={prof.key}
+                    type="button"
+                    onClick={() => handleProfileSelect(prof)}
+                    className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all cursor-pointer text-center relative ${
+                      isSelected
+                        ? 'border-primary ring-2 ring-primary/25 bg-primary/5 scale-102 shadow-xs'
+                        : 'border-border bg-card hover:bg-muted/50 hover:border-border/80'
+                    }`}
+                  >
+                    <div className={`p-1.5 rounded-lg mb-1.5 ${prof.color}`}>
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <span className="text-[9px] font-black text-foreground uppercase tracking-wide truncate max-w-full">
+                      {prof.label}
+                    </span>
+                    <span className="text-[7px] text-muted-foreground truncate max-w-full font-bold block mt-0.5">
+                      {prof.email.split('@')[0]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           <div className="h-px bg-border my-2" />
 
@@ -166,7 +164,7 @@ export function LoginPage() {
           />
 
           <div className="p-3 bg-muted border border-border rounded-lg text-left flex items-start gap-2.5">
-            <Key className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+            <Icons.Key className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
             <div className="text-[10px] text-muted-foreground font-semibold leading-relaxed">
               Super Admin logs in with `admin123`. Registered clinic owner accounts require Super Admin approval prior to authentication.
             </div>
@@ -174,7 +172,7 @@ export function LoginPage() {
 
           <Button type="submit" className="w-full h-11 gap-2 font-bold select-none cursor-pointer mt-4">
             Access System Sandbox
-            <ArrowRight className="h-4 w-4" />
+            <Icons.ArrowRight className="h-4 w-4" />
           </Button>
         </form>
 
