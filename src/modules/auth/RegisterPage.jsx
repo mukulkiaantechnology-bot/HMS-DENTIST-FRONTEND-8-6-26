@@ -84,7 +84,7 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-10 transition-colors duration-300 relative">
+    <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] dark:bg-[#090d16] px-4 py-10 transition-colors duration-300 relative">
       {/* Background gradients */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40 dark:opacity-25 z-0">
         <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-3xl" />

@@ -339,61 +339,31 @@ export function SuperAdminDashboardPage() {
 
       {/* AI Insights & System Logs Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* AI Control & Insights Panel */}
-        <div className="bg-card border border-border p-5 rounded-xl shadow-sm lg:col-span-2 space-y-4">
-          <div className="flex items-center gap-2 border-b border-border pb-3">
-            <Sparkles className="h-5 w-5 text-indigo-400 fill-indigo-400/20" />
-            <h3 className="font-extrabold text-sm text-foreground uppercase tracking-wider">AI Operations Auditing</h3>
-          </div>
-
-          <div className="space-y-3">
-            {/* Insight 1: Underperforming location */}
-            <div className="flex items-start gap-3.5 p-3 rounded-lg bg-red-500/5 border border-red-500/10 text-xs text-muted-foreground leading-relaxed">
-              <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
-              <div>
-                <span className="font-bold text-foreground block mb-0.5">Underperforming Trial Location</span>
-                Tacoma location (<span className="font-bold">Westside Pediatric Dental</span>) shows low active patient onboarding (120 registered). Recommend automated email campaign workflow trigger.
-              </div>
-            </div>
-
-            {/* Insight 2: Upgrade potential */}
-            <div className="flex items-start gap-3.5 p-3 rounded-lg bg-indigo-500/5 border border-indigo-500/10 text-xs text-muted-foreground leading-relaxed">
-              <Sparkles className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-              <div>
-                <span className="font-bold text-foreground block mb-0.5">Upgrade opportunity identified</span>
-                Northside Family Dentistry is currently on the <span className="font-bold">Basic plan</span> ($149) but has reached 450 registered patients. Upgrading to <span className="font-bold">Premium plan</span> will unlock AI recall reminders and increase capacity limits.
-              </div>
-            </div>
-
-            {/* Insight 3: Retention check */}
-            <div className="flex items-start gap-3.5 p-3 rounded-lg bg-cyan-500/5 border border-cyan-500/10 text-xs text-muted-foreground leading-relaxed">
-              <CheckCircle className="h-5 w-5 text-cyan-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <span className="font-bold text-foreground block mb-0.5">AI Diagnosis Enabled</span>
-                Vance Dental and Metropolitan Dental have successfully diagnosed 85+ periodontal pocket issues this week using automated DICOM imaging audit logs.
-              </div>
-            </div>
-          </div>
+        <div className="lg:col-span-2">
+          <AIInsightsPanel />
         </div>
 
-        {/* Real-time System Audit Logs */}
-        <div className="bg-card border border-border p-5 rounded-xl shadow-sm space-y-4">
-          <div className="flex items-center gap-2 border-b border-border pb-3">
-            <ScrollText className="h-4.5 w-4.5 text-muted-foreground" />
-            <h3 className="font-bold text-sm text-foreground uppercase tracking-wider">Audit Log Stream</h3>
-          </div>
-          <div className="space-y-3 max-h-[200px] overflow-y-auto pr-1 no-scrollbar text-xs font-semibold text-muted-foreground">
-            {auditLogs.map((log) => (
-              <div key={log.id} className="border-b border-border pb-2 last:border-0 last:pb-0">
-                <div className="flex justify-between items-center text-[10px] text-muted-foreground mb-0.5">
-                  <span className="text-primary font-bold">{log.user}</span>
-                  <span>{log.timestamp}</span>
+        <div className="space-y-6">
+          {/* Real-time System Audit Logs */}
+          <div className="bg-card border border-border p-5 rounded-xl shadow-sm space-y-4">
+            <div className="flex items-center gap-2 border-b border-border pb-3">
+              <ScrollText className="h-4.5 w-4.5 text-muted-foreground" />
+              <h3 className="font-bold text-sm text-foreground uppercase tracking-wider">Audit Log Stream</h3>
+            </div>
+            <div className="space-y-3 max-h-[200px] overflow-y-auto pr-1 no-scrollbar text-xs font-semibold text-muted-foreground">
+              {auditLogs.map((log) => (
+                <div key={log.id} className="border-b border-border pb-2 last:border-0 last:pb-0">
+                  <div className="flex justify-between items-center text-[10px] text-muted-foreground mb-0.5">
+                    <span className="text-primary font-bold">{log.user}</span>
+                    <span>{log.timestamp}</span>
+                  </div>
+                  <p className="text-foreground/90 font-medium text-left leading-relaxed">{log.action}</p>
+                  <span className="text-[9px] bg-secondary px-1.5 py-0.5 rounded text-muted-foreground font-bold uppercase mt-1 inline-block">{log.clinic}</span>
                 </div>
-                <p className="text-foreground/90 font-medium text-left leading-relaxed">{log.action}</p>
-                <span className="text-[9px] bg-secondary px-1.5 py-0.5 rounded text-muted-foreground font-bold uppercase mt-1 inline-block">{log.clinic}</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+          <BackupStatusCard />
         </div>
       </div>
 

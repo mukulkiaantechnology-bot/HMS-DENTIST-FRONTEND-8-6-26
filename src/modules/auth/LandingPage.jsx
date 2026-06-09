@@ -4,7 +4,6 @@ import {
   Activity,
   ShieldCheck,
   Cpu,
-  MessageSquare,
   TrendingUp,
   ArrowRight,
   Check,
@@ -98,7 +97,7 @@ export function LandingPage() {
   const heatmapDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300 overflow-x-hidden select-none font-sans relative">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#090d16] text-foreground transition-colors duration-300 overflow-x-hidden select-none font-sans relative">
 
       {/* Decorative blurred background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -108,7 +107,7 @@ export function LandingPage() {
       </div>
 
       {/* Navigation Header */}
-      <nav className="relative z-50 border-b border-border/60 bg-background/60 backdrop-blur-md sticky top-0 px-4 sm:px-6 lg:px-8">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/60 bg-[#f8fafc]/80 dark:bg-[#090d16]/80 backdrop-blur-md px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="bg-primary text-primary-foreground p-2 rounded-xl shadow-md flex items-center justify-center">
@@ -160,7 +159,7 @@ export function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 text-center space-y-8 animate-fade-in">
+      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20 text-center space-y-8 animate-fade-in">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-wider">
           <ShieldCheck className="h-4 w-4" />
           Global Multi-Clinic Control Console for Healthcare SaaS
@@ -223,35 +222,53 @@ export function LandingPage() {
           <p className="text-xs text-muted-foreground font-bold">Everything you need to orchestrate global operations from a single pane of glass.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-card/40 backdrop-blur-md border border-border p-6 rounded-2xl shadow-xs hover:border-primary/30 transition-all text-left">
-            <div className="h-10 w-10 bg-indigo-500/10 text-indigo-500 rounded-xl flex items-center justify-center mb-4">
-              <Globe className="h-5 w-5" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+          {/* Card 1: Visual Odontogram */}
+          <div className="group bg-card/40 backdrop-blur-md border border-border rounded-3xl overflow-hidden shadow-xs hover:shadow-lg hover:border-primary/40 transition-all duration-500 flex flex-col justify-between hover:scale-[1.02] cursor-pointer animate-slide-up">
+            <div className="p-6 text-left space-y-3">
+              <div className="h-10 w-10 bg-indigo-500/10 text-indigo-500 rounded-2xl flex items-center justify-center">
+                <Globe className="h-5 w-5 animate-pulse" />
+              </div>
+              <h3 className="font-extrabold text-sm text-foreground group-hover:text-primary transition-colors">Visual Odontogram Charting</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed font-semibold">
+                An interactive 32-teeth visual interface tracking restorative work, crowns, cavity scans, and custom implant cases synced across dental networks.
+              </p>
             </div>
-            <h3 className="font-extrabold text-sm mb-2 text-foreground">Centralized Hub</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed font-semibold">
-              Filter revenues, schedule metrics, and clinician workloads across 100+ branches instantly with multi-clinic analytics in real-time.
-            </p>
+            <div className="px-6 pb-6 pt-2 overflow-hidden h-48 relative">
+              <img src="/dental_charting.png" alt="Odontogram Charting" className="rounded-xl object-cover w-full h-full border border-border/60 shadow-xs transition-transform duration-500 group-hover:scale-105" />
+            </div>
           </div>
 
-          <div className="bg-card/40 backdrop-blur-md border border-border p-6 rounded-2xl shadow-xs hover:border-primary/30 transition-all text-left">
-            <div className="h-10 w-10 bg-emerald-500/10 text-emerald-500 rounded-xl flex items-center justify-center mb-4">
-              <Cpu className="h-5 w-5" />
+          {/* Card 2: AI Radiology */}
+          <div className="group bg-card/40 backdrop-blur-md border border-border rounded-3xl overflow-hidden shadow-xs hover:shadow-lg hover:border-primary/40 transition-all duration-500 flex flex-col justify-between hover:scale-[1.02] cursor-pointer animate-slide-up delay-100">
+            <div className="p-6 text-left space-y-3">
+              <div className="h-10 w-10 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center">
+                <Cpu className="h-5 w-5 animate-pulse" />
+              </div>
+              <h3 className="font-extrabold text-sm text-foreground group-hover:text-primary transition-colors">AI Radiology Diagnostics</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed font-semibold">
+                Computer-vision driven X-ray scanning detecting caries, bone loss, and periodontal issues automatically, complete with instant dashboard alerts.
+              </p>
             </div>
-            <h3 className="font-extrabold text-sm mb-2 text-foreground">AI Diagnostics</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed font-semibold">
-              Execute radiology bone checks, compute preventive risk indicators, and synchronize diagnostic findings instantly across clinic scopes.
-            </p>
+            <div className="px-6 pb-6 pt-2 overflow-hidden h-48 relative">
+              <img src="/dental_xray_ai.png" alt="AI Radiology Diagnostics" className="rounded-xl object-cover w-full h-full border border-border/60 shadow-xs transition-transform duration-500 group-hover:scale-105" />
+            </div>
           </div>
 
-          <div className="bg-card/40 backdrop-blur-md border border-border p-6 rounded-2xl shadow-xs hover:border-primary/30 transition-all text-left">
-            <div className="h-10 w-10 bg-amber-500/10 text-amber-500 rounded-xl flex items-center justify-center mb-4">
-              <MessageSquare className="h-5 w-5" />
+          {/* Card 3: Enterprise Hub */}
+          <div className="group bg-card/40 backdrop-blur-md border border-border rounded-3xl overflow-hidden shadow-xs hover:shadow-lg hover:border-primary/40 transition-all duration-500 flex flex-col justify-between hover:scale-[1.02] cursor-pointer animate-slide-up delay-200">
+            <div className="p-6 text-left space-y-3">
+              <div className="h-10 w-10 bg-purple-500/10 text-purple-500 rounded-2xl flex items-center justify-center">
+                <Activity className="h-5 w-5 animate-pulse" />
+              </div>
+              <h3 className="font-extrabold text-sm text-foreground group-hover:text-primary transition-colors">Multi-Clinic Enterprise Hub</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed font-semibold">
+                Consolidated control panel for multi-office practice groups. Standardize schedules, monitor dental lab crown workflows, and run global billing.
+              </p>
             </div>
-            <h3 className="font-extrabold text-sm mb-2 text-foreground">Recall Automation</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed font-semibold">
-              Schedule smart dispatch campaigns via SMS + WhatsApp automated reminders, re-engaging overdue checks automatically.
-            </p>
+            <div className="px-6 pb-6 pt-2 overflow-hidden h-48 relative">
+              <img src="/dental_dashboard.png" alt="Multi-Clinic Enterprise Hub" className="rounded-xl object-cover w-full h-full border border-border/60 shadow-xs transition-transform duration-500 group-hover:scale-105" />
+            </div>
           </div>
         </div>
       </section>

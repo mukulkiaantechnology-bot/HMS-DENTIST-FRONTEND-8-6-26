@@ -4,6 +4,7 @@ import { useDentalAssistantStore } from '../../../store/dentalAssistantStore';
 import { Button } from '../../../shared/ui/Button';
 import { Input } from '../../../shared/ui/Input';
 import { useToast } from '../../../shared/hooks/useToast';
+import { XrayAIViewer } from '../../../shared/ui/XrayAIViewer';
 
 export function XrayUploadPage() {
   const { todayPatients, activePatientId, xrayUploads, uploadXray } = useDentalAssistantStore();
@@ -213,6 +214,8 @@ export function XrayUploadPage() {
           )}
         </div>
       </div>
+
+      <XrayAIViewer patientName={activePatient?.name} />
     </div>
   );
 }

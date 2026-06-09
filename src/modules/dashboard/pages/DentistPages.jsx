@@ -22,6 +22,8 @@ import { Badge } from '../../../shared/ui/Badge';
 import { useToast } from '../../../shared/hooks/useToast';
 import { Modal } from '../../../shared/ui/Modal';
 import { DataTable } from '../../../shared/ui/DataTable';
+import { XrayAIViewer } from '../../../shared/ui/XrayAIViewer';
+import { DrugSafetyAlert } from '../../../shared/ui/DrugSafetyAlert';
 
 // ----------------------------------------------------
 // 1. PATIENTS REGISTRY PAGE
@@ -536,89 +538,96 @@ function XraysTab({ patientId }) {
     }, 2000);
   };
 
+  const { patients } = useDentistStore();
+  const patient = patients.find((p) => p.id === patientId);
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 py-4">
-      {/* Upload Panel */}
-      <div className="bg-card border border-border p-5 rounded-2xl shadow-sm text-left">
-        <h3 className="font-black text-sm uppercase text-primary tracking-wider border-b border-border pb-3 mb-4">Simulate Image Upload</h3>
-        <form onSubmit={handleUpload} className="space-y-4">
-          <Input
-            label="Radiography File Name"
-            value={fileInputName}
-            onChange={(e) => setFileInputName(e.target.value)}
-            required
-          />
-          <Input
-            label="Practitioner Notes"
-            value={fileNotes}
-            onChange={(e) => setFileNotes(e.target.value)}
-            placeholder="e.g. checkup right molar bitewing"
-          />
-          <Button type="submit" className="w-full font-bold h-11">
-            Simulate File Upload
-          </Button>
-        </form>
-      </div>
+    <div className="space-y-6 py-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Upload Panel */}
+        <div className="bg-card border border-border p-5 rounded-2xl shadow-sm text-left">
+          <h3 className="font-black text-sm uppercase text-primary tracking-wider border-b border-border pb-3 mb-4">Simulate Image Upload</h3>
+          <form onSubmit={handleUpload} className="space-y-4">
+            <Input
+              label="Radiography File Name"
+              value={fileInputName}
+              onChange={(e) => setFileInputName(e.target.value)}
+              required
+            />
+            <Input
+              label="Practitioner Notes"
+              value={fileNotes}
+              onChange={(e) => setFileNotes(e.target.value)}
+              placeholder="e.g. checkup right molar bitewing"
+            />
+            <Button type="submit" className="w-full font-bold h-11">
+              Simulate File Upload
+            </Button>
+          </form>
+        </div>
 
-      {/* Radiograph list and AI checks */}
-      <div className="lg:col-span-2 bg-card border border-border p-5 rounded-2xl shadow-sm text-left space-y-4">
-        <h3 className="font-black text-sm uppercase text-primary tracking-wider border-b border-border pb-3">Dental Radiographs</h3>
+        {/* Radiograph list and AI checks */}
+        <div className="lg:col-span-2 bg-card border border-border p-5 rounded-2xl shadow-sm text-left space-y-4">
+          <h3 className="font-black text-sm uppercase text-primary tracking-wider border-b border-border pb-3">Dental Radiographs</h3>
 
-        <div className="grid grid-cols-1 gap-4 max-h-[350px] overflow-y-auto pr-1">
-          {list.length > 0 ? (
-            list.map((xr) => {
-              const isScanning = scanningXrayId === xr.id;
-              return (
-                <div key={xr.id} className="p-4 bg-muted/40 border border-border rounded-xl flex flex-col md:flex-row justify-between gap-4">
-                  <div className="space-y-2 flex-1">
-                    <div className="flex items-center gap-2 text-xs">
-                      <span className="font-extrabold text-foreground">{xr.name}</span>
-                      <span className="text-muted-foreground font-semibold">({xr.date})</span>
-                    </div>
-                    <p className="text-[10px] font-semibold text-muted-foreground">{xr.notes}</p>
-                    
-                    {xr.aiReport && (
-                      <div className="p-3 bg-indigo-500/5 border border-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-lg text-[10px] font-semibold flex items-start gap-1.5 mt-2">
-                        <Sparkles className="h-4 w-4 flex-shrink-0 mt-0.5 text-primary" />
-                        <span>{xr.aiReport}</span>
+          <div className="grid grid-cols-1 gap-4 max-h-[350px] overflow-y-auto pr-1">
+            {list.length > 0 ? (
+              list.map((xr) => {
+                const isScanning = scanningXrayId === xr.id;
+                return (
+                  <div key={xr.id} className="p-4 bg-muted/40 border border-border rounded-xl flex flex-col md:flex-row justify-between gap-4">
+                    <div className="space-y-2 flex-1">
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="font-extrabold text-foreground">{xr.name}</span>
+                        <span className="text-muted-foreground font-semibold">({xr.date})</span>
                       </div>
-                    )}
-                  </div>
+                      <p className="text-[10px] font-semibold text-muted-foreground">{xr.notes}</p>
+                      
+                      {xr.aiReport && (
+                        <div className="p-3 bg-indigo-500/5 border border-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-lg text-[10px] font-semibold flex items-start gap-1.5 mt-2">
+                          <Sparkles className="h-4 w-4 flex-shrink-0 mt-0.5 text-primary" />
+                          <span>{xr.aiReport}</span>
+                        </div>
+                      )}
+                    </div>
 
-                  <div className="flex items-center justify-end md:border-l md:border-border/60 md:pl-4">
-                    {!xr.isScanned ? (
-                      <Button
-                        size="sm"
-                        disabled={isScanning}
-                        onClick={() => handleAIScan(xr.id)}
-                        className="font-bold text-[10px] h-9 gap-1 bg-indigo-600 hover:bg-indigo-700 hover:scale-105"
-                      >
-                        {isScanning ? (
-                          <>
-                            <Clock className="h-3.5 w-3.5 animate-spin" />
-                            Auditing...
-                          </>
-                        ) : (
-                          <>
-                            <Brain className="h-3.5 w-3.5" />
-                            Run AI Diagnostics
-                          </>
-                        )}
-                      </Button>
-                    ) : (
-                      <Badge variant="info" className="gap-1 font-bold">
-                        <Check className="h-3 w-3" /> Scanned
-                      </Badge>
-                    )}
+                    <div className="flex items-center justify-end md:border-l md:border-border/60 md:pl-4">
+                      {!xr.isScanned ? (
+                        <Button
+                          size="sm"
+                          disabled={isScanning}
+                          onClick={() => handleAIScan(xr.id)}
+                          className="font-bold text-[10px] h-9 gap-1 bg-indigo-600 hover:bg-indigo-700 hover:scale-105"
+                        >
+                          {isScanning ? (
+                            <>
+                              <Clock className="h-3.5 w-3.5 animate-spin" />
+                              Auditing...
+                            </>
+                          ) : (
+                            <>
+                              <Brain className="h-3.5 w-3.5" />
+                              Run AI Diagnostics
+                            </>
+                          )}
+                        </Button>
+                      ) : (
+                        <Badge variant="info" className="gap-1 font-bold">
+                          <Check className="h-3 w-3" /> Scanned
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })
-          ) : (
-            <span className="text-muted-foreground text-xs font-semibold italic block py-8 text-center">No radiography files recorded for this patient.</span>
-          )}
+                );
+              })
+            ) : (
+              <span className="text-muted-foreground text-xs font-semibold italic block py-8 text-center">No radiography files recorded for this patient.</span>
+            )}
+          </div>
         </div>
       </div>
+
+      <XrayAIViewer patientName={patient?.name} />
     </div>
   );
 }
@@ -651,9 +660,15 @@ function PrescriptionTab({ patientId }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 py-4">
       {/* Pharmacy search and create form */}
-      <div className="bg-card border border-border p-5 rounded-2xl shadow-sm text-left">
-        <h3 className="font-black text-sm uppercase text-primary tracking-wider border-b border-border pb-3 mb-4">Write Pharmacy RX</h3>
+      <div className="bg-card border border-border p-5 rounded-2xl shadow-sm text-left space-y-4">
+        <h3 className="font-black text-sm uppercase text-primary tracking-wider border-b border-border pb-3">Write Pharmacy RX</h3>
         
+        <DrugSafetyAlert
+          patientId={patientId}
+          activePrescribedDrug={drug}
+          onSwitchMedication={(med) => setDrug(med)}
+        />
+
         <form onSubmit={handleAddRx} className="space-y-4">
           <Select
             label="Search Pharmacy Drug"
@@ -769,64 +784,68 @@ function NotesTab({ patientId }) {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 py-4">
-      {/* Editor Main */}
-      <div className="lg:col-span-2 bg-card border border-border p-5 rounded-2xl shadow-sm text-left flex flex-col justify-between space-y-4">
-        <div className="flex items-center justify-between border-b border-border pb-3">
-          <h3 className="font-black text-sm uppercase text-primary tracking-wider flex items-center gap-2">
-            Clinical EHR Note Editor
-          </h3>
-          <div className="flex items-center gap-1.5 text-[10px] font-bold">
-            {saveState === 'Saving...' && (
-              <span className="text-amber-500 flex items-center gap-1">
-                <Clock className="h-3 w-3 animate-spin" />
-                Autosaving to cloud...
-              </span>
-            )}
-            {saveState === 'Saved' && (
-              <span className="text-emerald-500 flex items-center gap-1">
-                <Check className="h-3 w-3" />
-                Saved to EHR
-              </span>
-            )}
+    <div className="space-y-6 py-4">
+      <DrugSafetyAlert patientId={patientId} activePrescribedDrug="" />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Editor Main */}
+        <div className="lg:col-span-2 bg-card border border-border p-5 rounded-2xl shadow-sm text-left flex flex-col justify-between space-y-4">
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <h3 className="font-black text-sm uppercase text-primary tracking-wider flex items-center gap-2">
+              Clinical EHR Note Editor
+            </h3>
+            <div className="flex items-center gap-1.5 text-[10px] font-bold">
+              {saveState === 'Saving...' && (
+                <span className="text-amber-500 flex items-center gap-1">
+                  <Clock className="h-3 w-3 animate-spin" />
+                  Autosaving to cloud...
+                </span>
+              )}
+              {saveState === 'Saved' && (
+                <span className="text-emerald-500 flex items-center gap-1">
+                  <Check className="h-3.5 w-3.5" />
+                  Saved to EHR
+                </span>
+              )}
+            </div>
           </div>
-        </div>
 
-        <textarea
-          value={editorText}
-          onChange={handleNotesChange}
-          placeholder="Start typing clinical notes here... Auto-saves automatically."
-          className="w-full flex-1 min-h-[280px] p-4 bg-muted/30 border border-border rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary leading-relaxed text-foreground"
-        />
-      </div>
-
-      {/* Templates Selector */}
-      <div className="bg-card border border-border p-5 rounded-2xl shadow-sm text-left space-y-4 flex flex-col justify-between">
-        <div className="space-y-4">
-          <h3 className="font-black text-sm uppercase text-primary tracking-wider border-b border-border pb-3">Clinical Templates</h3>
-          
-          <Select
-            label="Inject Clinical Templates"
-            onChange={handleTemplateSelect}
-            options={[
-              { value: '', label: '-- Choose Template --' },
-              { value: 'comp_exam', label: 'Comprehensive Exam template' },
-              { value: 'hygiene', label: 'Hygiene Prophy template' },
-              { value: 'rct_pulp', label: 'RCT Pulp Diagnostic template' }
-            ]}
+          <textarea
+            value={editorText}
+            onChange={handleNotesChange}
+            placeholder="Start typing clinical notes here... Auto-saves automatically."
+            className="w-full flex-1 min-h-[280px] p-4 bg-muted/30 border border-border rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary leading-relaxed text-foreground"
           />
-
-          <div className="p-4 bg-muted/50 border border-border rounded-xl space-y-2">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Autosave Engine</span>
-            <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">
-              Clinical changes are auto-saved in real time. De-bouncing prevents interruptions during surgical patient operations.
-            </p>
-          </div>
         </div>
 
-        <Button onClick={() => toast.success('Notes signed and finalized successfully.')} className="w-full font-bold text-xs py-5 bg-emerald-500 hover:bg-emerald-600">
-          Sign & Finalize Notes
-        </Button>
+        {/* Templates Selector */}
+        <div className="bg-card border border-border p-5 rounded-2xl shadow-sm text-left space-y-4 flex flex-col justify-between">
+          <div className="space-y-4">
+            <h3 className="font-black text-sm uppercase text-primary tracking-wider border-b border-border pb-3">Clinical Templates</h3>
+            
+            <Select
+              label="Inject Clinical Templates"
+              onChange={handleTemplateSelect}
+              options={[
+                { value: '', label: '-- Choose Template --' },
+                { value: 'comp_exam', label: 'Comprehensive Exam template' },
+                { value: 'hygiene', label: 'Hygiene Prophy template' },
+                { value: 'rct_pulp', label: 'RCT Pulp Diagnostic template' }
+              ]}
+            />
+
+            <div className="p-4 bg-muted/50 border border-border rounded-xl space-y-2">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Autosave Engine</span>
+              <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">
+                Clinical changes are auto-saved in real time. De-bouncing prevents interruptions during surgical patient operations.
+              </p>
+            </div>
+          </div>
+
+          <Button onClick={() => toast.success('Notes signed and finalized successfully.')} className="w-full font-bold text-xs py-5 bg-emerald-500 hover:bg-emerald-600">
+            Sign & Finalize Notes
+          </Button>
+        </div>
       </div>
     </div>
   );
